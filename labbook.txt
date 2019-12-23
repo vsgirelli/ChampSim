@@ -1,0 +1,24 @@
+22/12/19
+
+Pra facilitar a escolha das aplicações, eu só executei o script que tem no dir
+scripts e fiz o download daqueles traces que tem lá.
+Recomendo que todos façam o mesmo e não botem os traces no remote por motivos de
+20gb :)
+
+
+Infos de cada bench podem ser encontradas na página do SPEC CPU 2006:
+https://www.spec.org/cpu2006/Docs/
+
+Alguns padrões que eu acho interessantes de serem considerados:
+- bzip2: integer. Imagino que compressão tenha um padrão de acesso aos dados
+  contíguo e regular. Desse modo, com um prefetcher stream a gente consegue
+tirar mais proveito do que com um prefetcher strided por ex. Ainda mostraria como
+qualquer algoritmo de substituição não seria lá muito eficiente.
+- GCC: são bons pra mostrar que foda-se. Acessos bem irregulares pros quais é
+  difícil acertar qualquer coisa.
+- astar: integer. Algoritmos de path finding, ou seja, grafos com muito acesso à
+  memória e de forma irregular.
+- soplex: floating point e otimização. Interessante por ser floating point. Mas
+  qual o padrão de acesso à mem?
+
+Any ideas?
