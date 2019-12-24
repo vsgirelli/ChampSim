@@ -21,6 +21,8 @@ conta da evolução dos branch predictors escolhidos.
 - astar: integer. Algoritmos de path finding, ou seja, grafos com muito acesso à
   memória e de forma irregular.
 - povray: ray tracing. Normalmente OO, o que torna o acesso à mem interessante.
+  Also: iterações pelos objetos a cada pulo, teste de intersecção: branch
+predictor.
 - calculix: matrizes esparsas pra resolver equações diferenciais. Matrizes
   esparsas.
 
