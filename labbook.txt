@@ -13,12 +13,17 @@ Alguns padrões que eu acho interessantes de serem considerados:
 - bzip2: integer. Imagino que compressão tenha um padrão de acesso aos dados
   contíguo e regular. Desse modo, com um prefetcher stream a gente consegue
 tirar mais proveito do que com um prefetcher strided por ex. Ainda mostraria como
-qualquer algoritmo de substituição não seria lá muito eficiente.
-- GCC: são bons pra mostrar que foda-se. Acessos bem irregulares pros quais é
-  difícil acertar qualquer coisa.
+qualquer algoritmo de substituição não seria lá muito eficiente. Checar com
+Francis.
+- GCC: Acessos bem irregulares pros quais é difícil acertar qualquer coisa. Also
+  é importante lembrar que haverá melhoras de uma configuração pra outra por
+conta da evolução dos branch predictors escolhidos.
 - astar: integer. Algoritmos de path finding, ou seja, grafos com muito acesso à
   memória e de forma irregular.
-- soplex: floating point e otimização. Interessante por ser floating point. Mas
-  qual o padrão de acesso à mem?
+- povray: ray tracing. Normalmente OO, o que torna o acesso à mem interessante.
+  Also: iterações pelos objetos a cada pulo, teste de intersecção: branch
+predictor.
+- calculix: matrizes esparsas pra resolver equações diferenciais. Matrizes
+  esparsas.
 
 Any ideas?
