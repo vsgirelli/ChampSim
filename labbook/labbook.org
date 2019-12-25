@@ -52,3 +52,14 @@ implement. Here's an excerpt:
 I mean, I've got no idea of what benchmarks exercise the different parts of the
 processor, so I'm all for it. As far as the simulator goes, I'll try to figure
 out how it works. Time to read that convoluted =readme=...
+
+So, I've understood how it works (because it's really easy to build and run
+stuff). Thing is, I have absolutely no idea on how to implement the stuff
+mentioned previously (the new policies, etc). Like, really no idea. I took a
+look at all the modules we could implement, but they're really not that easy to
+understand, which may have something to do with the fact that I don't know this
+architecture stuff in the first place. And I'm kinda traumatized to go search in
+those terrible slides because of my previous experiences.
+
+I doubt that this simulator has seen some use in the academy, but I'll go look
+for something anyways...

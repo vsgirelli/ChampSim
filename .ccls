@@ -1,0 +1,7 @@
+clang++
+%h -x
+%h c++-header
+%cpp -std=c++11
+%cc -std=c++11
+-Iinc
+-Isrc
