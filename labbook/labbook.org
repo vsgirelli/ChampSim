@@ -37,6 +37,10 @@ implement.
     - [[#design-2][Design]]
     - [[#script-2][Script]]
     - [[#analysis-2][Analysis]]
+  - [[#4---our-processor][4 - Our processor]]
+    - [[#design-3][Design]]
+    - [[#script-3][Script]]
+    - [[#analysis-3][Analysis]]
 
 * Journal
 
@@ -171,6 +175,22 @@ LLC Prefetcher: next_line
 LLC Replacement: drrip
 Cores: 1
 #+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
+
+** 4 - Our processor                                                 :EXP04:
+
+Unknown characteristics!
 
 *** Design
 
