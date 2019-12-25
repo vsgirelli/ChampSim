@@ -78,3 +78,91 @@ than the ones I've collected.
 
 Besides that stuff, I'm looking forward into having access to the report so I
 can use the IEEE template.
+
+* Experiments
+
+Home to experiment-related scripts.
+
+As defined in the specification of this assignment, all simulations will be
+single-core, even though the simulator supports multi-core. So, as interference
+isn't an issue, I'm thinking of launching as many executions as I can. This
+would speed up the experiments significantly, but would imply in multiple copies
+of the repo.
+
+** 1 - Simple processor                                              :EXP01:
+
+The simplest of the bunch:
+
+#+begin_example
+Branch Predictor: bimodal
+L1D Prefetcher: no
+L1I Prefetcher: no
+L2C Prefetcher: no
+LLC Prefetcher: no
+LLC Replacement: lru
+Cores: 1
+#+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
+
+** 2 - Medium processor                                              :EXP02:
+
+The "almost there" of the bunch:
+
+#+begin_example
+Branch Predictor: bimodal
+L1D Prefetcher: next_line
+L1I Prefetcher: next_line
+L2C Prefetcher: ip_stride
+LLC Prefetcher: no
+LLC Replacement: lru
+Cores: 1
+#+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
+
+** 3 - The fast processor                                            :EXP03:
+
+The fastest of the bunch:
+
+#+begin_example
+Branch Predictor: hashed_perceptron
+L1D Prefetcher: next_line
+L1I Prefetcher: next_line
+L2C Prefetcher: kpcp
+LLC Prefetcher: next_line
+LLC Replacement: drrip
+Cores: 1
+#+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
