@@ -21,6 +21,23 @@ modules of a processor that's being simulated:
 As of now we are still considering the options as of which of those we should
 implement.
 
+* Table of contents                                                   :TOC_3:
+- [[#journal][Journal]]
+  - [[#2019-12-25][2019-12-25]]
+- [[#experiments][Experiments]]
+  - [[#1---simple-processor][1 - Simple processor]]
+    - [[#design][Design]]
+    - [[#script][Script]]
+    - [[#analysis][Analysis]]
+  - [[#2---medium-processor][2 - Medium processor]]
+    - [[#design-1][Design]]
+    - [[#script-1][Script]]
+    - [[#analysis-1][Analysis]]
+  - [[#3---the-fast-processor][3 - The fast processor]]
+    - [[#design-2][Design]]
+    - [[#script-2][Script]]
+    - [[#analysis-2][Analysis]]
+
 * Journal
 
 Thoughts and stuff.
