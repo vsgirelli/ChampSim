@@ -14,9 +14,9 @@ put my scripts and so on and so forth.
 As you may know, in this assignment we're expected to implement one or more
 modules of a processor that's being simulated:
 
-- Prefetcher
-- Cache substitution policy
-- Branch predictor
+- *Prefetcher*
+- *Cache substitution policy*
+- *Branch predictor*
 
 As of now we are still considering the options as of which of those we should
 implement.
@@ -63,3 +63,18 @@ those terrible slides because of my previous experiences.
 
 I doubt that this simulator has seen some use in the academy, but I'll go look
 for something anyways...
+
+Well, I'll be damned! Here are some links:
+
+- [[https://arxiv.org/pdf/1906.00877.pdf]]
+- [[http://nope.pub/papers/2017/gomes2017watermarking.pdf]]
+- [[https://www.usenix.org/system/files/woot19-paper_kumar.pdf]]
+
+There are more, but the point was made. I think those are a bit overkill for a
+simple uni assignment, because all of them verse about some really
+state-of-the-art stuff. I'm thinking about finding some novel approach proposed
+in the 80s-90s and implementing it, as these ought to be significantly simpler
+than the ones I've collected.
+
+Besides that stuff, I'm looking forward into having access to the report so I
+can use the IEEE template.
