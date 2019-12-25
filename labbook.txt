@@ -18,8 +18,7 @@ Francis.
 - GCC: Acessos bem irregulares pros quais é difícil acertar qualquer coisa. Also
   é importante lembrar que haverá melhoras de uma configuração pra outra por
 conta da evolução dos branch predictors escolhidos.
-- astar: integer. Algoritmos de path finding, ou seja, grafos com muito acesso à
-  memória e de forma irregular.
+- astar: integer. Algoritmos de path finding em ambiente 2D.
 - povray: ray tracing. Normalmente OO, o que torna o acesso à mem interessante.
   Also: iterações pelos objetos a cada pulo, teste de intersecção: branch
 predictor.
@@ -27,3 +26,10 @@ predictor.
   esparsas.
 
 Any ideas?
+
+24/12/19
+
+Aqui na tese do Marco Zanatta (ex aluno do Navaux) tem infos sobre as aplicações
+do SPEC (https://lume.ufrgs.br/handle/10183/96062). Aqui nesse coiso tbm:
+https://www.ece.lsu.edu/lpeng/papers/isast08.pdf
+Útil pra adicionar infos no relatório.
