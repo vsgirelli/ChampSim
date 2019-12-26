@@ -1,0 +1,205 @@
+#+title: Final Assignment's Labbook
+#+author: Henrique Silva
+#+email: hcpsilva@inf.ufrgs.br
+#+infojs_opt:
+#+property: session *R*
+#+property: cache yes
+#+property: results graphics
+#+property: exports both
+#+property: tangle yes
+
+Welcome to this project's lab-book! Here I'll organize my thoughts and perhaps
+put my scripts and so on and so forth.
+
+As you may know, in this assignment we're expected to implement one or more
+modules of a processor that's being simulated:
+
+- *Prefetcher*
+- *Cache substitution policy*
+- *Branch predictor*
+
+As of now we are still considering the options as of which of those we should
+implement.
+
+* Table of contents                                                   :TOC_3:
+- [[#journal][Journal]]
+  - [[#2019-12-25][2019-12-25]]
+- [[#experiments][Experiments]]
+  - [[#1---simple-processor][1 - Simple processor]]
+    - [[#design][Design]]
+    - [[#script][Script]]
+    - [[#analysis][Analysis]]
+  - [[#2---medium-processor][2 - Medium processor]]
+    - [[#design-1][Design]]
+    - [[#script-1][Script]]
+    - [[#analysis-1][Analysis]]
+  - [[#3---the-fast-processor][3 - The fast processor]]
+    - [[#design-2][Design]]
+    - [[#script-2][Script]]
+    - [[#analysis-2][Analysis]]
+  - [[#4---our-processor][4 - Our processor]]
+    - [[#design-3][Design]]
+    - [[#script-3][Script]]
+    - [[#analysis-3][Analysis]]
+
+* Journal
+
+Thoughts and stuff.
+
+** 2019-12-25
+
+Merry Christmas I guess. So, we've got a preliminary list of what applications
+to test, which is always useful, but still no idea of which element to
+implement. Here's an excerpt:
+
+#+begin_quote
+- bzip2 :: integer. Imagino que compressão tenha um padrão de acesso aos dados
+           contíguo e regular. Desse modo, com um prefetcher stream a gente
+           consegue tirar mais proveito do que com um prefetcher strided por
+           ex. Ainda mostraria como qualquer algoritmo de substituição não seria
+           lá muito eficiente. Checar com Francis.
+- gcc :: Acessos bem irregulares pros quais é difícil acertar qualquer
+         coisa. Also é importante lembrar que haverá melhoras de uma
+         configuração pra outra por conta da evolução dos branch predictors
+         escolhidos.
+- astar :: integer. Algoritmos de path finding em ambiente 2D.
+- povray :: ray tracing. Normalmente OO, o que torna o acesso à mem
+            interessante.  Also: iterações pelos objetos a cada pulo, teste de
+            intersecção: branch predictor.
+- calculix :: matrizes esparsas pra resolver equações diferenciais. Matrizes
+              esparsas.
+#+end_quote
+
+I mean, I've got no idea of what benchmarks exercise the different parts of the
+processor, so I'm all for it. As far as the simulator goes, I'll try to figure
+out how it works. Time to read that convoluted =readme=...
+
+So, I've understood how it works (because it's really easy to build and run
+stuff). Thing is, I have absolutely no idea on how to implement the stuff
+mentioned previously (the new policies, etc). Like, really no idea. I took a
+look at all the modules we could implement, but they're really not that easy to
+understand, which may have something to do with the fact that I don't know this
+architecture stuff in the first place. And I'm kinda traumatized to go search in
+those terrible slides because of my previous experiences.
+
+I doubt that this simulator has seen some use in the academy, but I'll go look
+for something anyways...
+
+Well, I'll be damned! Here are some links:
+
+- [[https://arxiv.org/pdf/1906.00877.pdf]]
+- [[http://nope.pub/papers/2017/gomes2017watermarking.pdf]]
+- [[https://www.usenix.org/system/files/woot19-paper_kumar.pdf]]
+
+There are more, but the point was made. I think those are a bit overkill for a
+simple uni assignment, because all of them verse about some really
+state-of-the-art stuff. I'm thinking about finding some novel approach proposed
+in the 80s-90s and implementing it, as these ought to be significantly simpler
+than the ones I've collected.
+
+Besides that stuff, I'm looking forward into having access to the report so I
+can use the IEEE template.
+
+* Experiments
+
+Home to experiment-related scripts.
+
+As defined in the specification of this assignment, all simulations will be
+single-core, even though the simulator supports multi-core. So, as interference
+isn't an issue, I'm thinking of launching as many executions as I can. This
+would speed up the experiments significantly, but would imply in multiple copies
+of the repo.
+
+** 1 - Simple processor                                              :EXP01:
+
+The simplest of the bunch:
+
+#+begin_example
+Branch Predictor: bimodal
+L1D Prefetcher: no
+L1I Prefetcher: no
+L2C Prefetcher: no
+LLC Prefetcher: no
+LLC Replacement: lru
+Cores: 1
+#+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
+
+** 2 - Medium processor                                              :EXP02:
+
+The "almost there" of the bunch:
+
+#+begin_example
+Branch Predictor: bimodal
+L1D Prefetcher: next_line
+L1I Prefetcher: next_line
+L2C Prefetcher: ip_stride
+LLC Prefetcher: no
+LLC Replacement: lru
+Cores: 1
+#+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
+
+** 3 - The fast processor                                            :EXP03:
+
+The fastest of the bunch:
+
+#+begin_example
+Branch Predictor: hashed_perceptron
+L1D Prefetcher: next_line
+L1I Prefetcher: next_line
+L2C Prefetcher: kpcp
+LLC Prefetcher: next_line
+LLC Replacement: drrip
+Cores: 1
+#+end_example
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
+
+** 4 - Our processor                                                 :EXP04:
+
+Unknown characteristics!
+
+*** Design
+
+Placeholder
+
+*** Script
+
+Placeholder
+
+*** Analysis
+
+Placeholder
