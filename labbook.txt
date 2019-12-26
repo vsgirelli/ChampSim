@@ -33,3 +33,22 @@ Aqui na tese do Marco Zanatta (ex aluno do Navaux) tem infos sobre as aplicaçõ
 do SPEC (https://lume.ufrgs.br/handle/10183/96062). Aqui nesse coiso tbm:
 https://www.ece.lsu.edu/lpeng/papers/isast08.pdf
 Útil pra adicionar infos no relatório.
+
+
+25/12/19
+
+Sobre o código:
+
+A cache é uma matriz de objetos do tipo block. Em ooo_cpu.cc:643: quando ocorre
+um hit a um bloco da cache de instruções, o prefetcher desse bloco é chamado (se
+houve hit, então pode-se por ex fazer prefetch da próxima linha de cache).
+
+O código que ta nos arquivos de prefetcher é só o funcionamento básico de
+cálculo do endereço a ser prefetched. A ação de buscar a linha é feita pela
+cache mesmo.
+
+
+Um stat útil: pf_issued.
+
+Sobre o prefetcher kill the program counter prefetcher (kpcp):
+http://hpca23.cse.tamu.edu/pdfs/p737-kim.pdf

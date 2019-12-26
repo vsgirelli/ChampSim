@@ -1,5 +1,5 @@
-401.bzip2-226B.champsimtrace.xz
-453.povray-576B.champsimtrace.xz
+401.bzip2-38B.champsimtrace.xz
+403.gcc-48B.champsimtrace.xz
+453.povray-252B.champsimtrace.xz
 454.calculix-104B.champsimtrace.xz
-473.astar-153B.champsimtrace.xz
-602.gcc_s-734B.champsimtrace.xz
+473.astar-42B.champsimtrace.xz

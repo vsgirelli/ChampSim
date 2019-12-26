@@ -5,8 +5,13 @@ void CACHE::l1d_prefetcher_initialize()
     cout << "CPU " << cpu << " L1D next line prefetcher" << endl;
 }
 
+// ip stands for instruction pointer, and I don't see how the ip could be useful in the next line pref
+// for the type, not really important but is about read or write
 void CACHE::l1d_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type)
 {
+    // god please help me understand this
+    // why do the << and the +1 are necessary?
+    // in the case of the l1D, the addr comes diretly from the load queue
     uint64_t pf_addr = ((addr>>LOG2_BLOCK_SIZE)+1) << LOG2_BLOCK_SIZE;
 
     DP ( if (warmup_complete[cpu]) {
