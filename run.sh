@@ -8,6 +8,6 @@ apps=(401.bzip2-38B.champsimtrace.xz 403.gcc-48B.champsimtrace.xz 453.povray-252
 
 for machine in "${machines[@]}"; do
   for app in "${apps[@]}"; do
-    sbatch --error="slurm/%j_$app.$machine.err" --output="slurm/%j_$app.$machine.out" -J "$app.$mahcine" run.slurm $app $machine
+    sbatch --error="slurm/%j_$app.$machine.err" --output="slurm/%j_$app.$machine.out" -J "$app.$machine" run.slurm $app $machine
   done
 done
