@@ -17,6 +17,6 @@ cd $SCRATCH/ChampSim/
 
 ./run_champsim.sh $machine 5 200 $app
 
-cp -r ./results_200000000M $HOME/ChampSim/
+cp -r ./results_200M $HOME/ChampSim/
 date
 
