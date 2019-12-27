@@ -26,21 +26,10 @@ implement.
   - [[#2019-12-25][2019-12-25]]
 - [[#experiments][Experiments]]
   - [[#1---simple-processor][1 - Simple processor]]
-    - [[#design][Design]]
-    - [[#script][Script]]
+    - [[#preprocessing][Preprocessing]]
     - [[#analysis][Analysis]]
-  - [[#2---medium-processor][2 - Medium processor]]
-    - [[#design-1][Design]]
-    - [[#script-1][Script]]
+  - [[#2---our-processor][2 - Our processor]]
     - [[#analysis-1][Analysis]]
-  - [[#3---the-fast-processor][3 - The fast processor]]
-    - [[#design-2][Design]]
-    - [[#script-2][Script]]
-    - [[#analysis-2][Analysis]]
-  - [[#4---our-processor][4 - Our processor]]
-    - [[#design-3][Design]]
-    - [[#script-3][Script]]
-    - [[#analysis-3][Analysis]]
 
 * Journal
 
@@ -124,113 +113,6 @@ LLC Replacement: lru
 Cores: 1
 #+end_example
 
-*** Design
-
-A set of 5 applications will be executed.
-
-The random seed will be:
-
-#+begin_src R :session :results value :exports results
-floor(runif(1,1,99999))
-#+end_src
-
-#+RESULTS:
-: 99692
-
-#+begin_src R :session :results output
-suppressMessages(library(DoE.base))
-suppressMessages(library(tidyverse))
-
-nb = c(32, 64, 128, 256, 512)
-app = c("bzip2", "gcc", "povray", "calculix", "astar")
-
-complete <- fac.design(
-  nfactors=2,
-  replications=30,
-  repeat.only=FALSE,
-  blocks=1,
-  randomize=TRUE,
-  seed=99692,
-  factor.names=list(
-    dummy=nb,
-    application=app)) %>%
-  as_tibble %>%
-  filter(dummy == 32) %>%
-  transmute(id=as.numeric(Blocks), application) %>%
-  write_delim("experiments/exp01/runs.plan", delim=" ", col_names=FALSE)
-
-# the space delimited file is to help with the posterior parsing in the shell
-# script
-#+end_src
-
-#+RESULTS:
-: creating full factorial with 25 runs ...
-
-*** Script
-
-#+begin_src bash :shebang "#!/bin/bash" :tangle experiments/exp01/exp.slurm
-#SBATCH --time=72:00:00
-#SBATCH --chdir=.
-#SBATCH --output=/home/users/hcpsilva/slurm_outputs/%x_%j.out
-#SBATCH --error=/home/users/hcpsilva/slurm_outputs/%x_%j.err
-#SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=hcpsilva@inf.ufrgs.br
-
-# more robust script
-set -euo pipefail
-
-# parameters:
-# the experiment ID, defined in the lab-book
-EXP_ID=$1
-# the experiment directory
-EXP_DIR=$2
-
-HOST=$(hostname)
-
-# experiment name (which is the ID and the machine and its core count)
-EXP_NAME=${EXP_ID}_${HOST}_${SLURM_CPUS_ON_NODE}
-
-# seed generated in project design
-RAND_SEED=99692
-
-# go to the scratch dir to execute our operations
-cd $SCRATCH
-
-# clean up my scratch dir
-rm -rf *
-
-# execute the experiment
-while read -r id application; do
-    echo "-> Parameters set to: $application"
-
-    # output log file
-    log_file=results/${application}_${id}.log
-
-    # execute given runtime and log results
-    ./code/build/block_qr_$runtime \
-         $matrix \
-         $num_blocks \
-         $RAND_SEED \
-         $MAXVAL > $log_file 2>&1
-
-    # get compute and total times from output
-    ctime=$(grep -w compute_time $log_file | awk '{print $2}')
-    ttime=$(grep -w total_time $log_file | awk '{print $2}')
-
-    # add the execution data to the csv
-    echo ${HOST},${id},${application},${ctime},${ttime} >> $results_csv
-
-    echo
-done < $EXP_DIR/runs.plan
-#+end_src
-
-
-*** Analysis
-
-Placeholder
-
-** 2 - Medium processor                                              :EXP02:
-
 The "almost there" of the bunch:
 
 #+begin_example
@@ -242,20 +124,6 @@ LLC Prefetcher: no
 LLC Replacement: lru
 Cores: 1
 #+end_example
-
-*** Design
-
-Placeholder
-
-*** Script
-
-Placeholder
-
-*** Analysis
-
-Placeholder
-
-** 3 - The fast processor                                            :EXP03:
 
 The fastest of the bunch:
 
@@ -269,29 +137,180 @@ LLC Replacement: drrip
 Cores: 1
 #+end_example
 
-*** Design
+*** Preprocessing
 
-Placeholder
+In order to analyze the data, we must parse the output files to a more friendly
+=csv= format.
 
-*** Script
+401.bzip2-38B.champsimtrace.xz-bimodal-next_line-next_line-ip_stride-no-lru-1core.txt
 
-Placeholder
+#+begin_src bash :exports both :results output :dir ../results_200M/
+OUT_FILE=base_results.csv
+
+echo "application,size,branch,l1d_pref,l2c_pref,llc_pref,llc_rep,inst,cycles,ipc,l1d_tot_hit,l1d_tot_miss,l1d_pref_issued,l1d_pref_useful,l1d_pref_useless,l1d_lat,l2c_tot_hit,l2c_tot_miss,l2c_pref_issued,l2c_pref_useful,l2c_pref_useless,l2c_lat,llc_tot_hit,llc_tot_miss,llc_pref_issued,llc_pref_useful,llc_pref_useless,llc_lat,branch_acc,mpki,branch_direct,branch_indirect,branch_cond,branch_dir_call,branch_ind_call,branch_ret" > $OUT_FILE
+
+for file in [0-9]*; do
+    buffer=$(tr '-' ' ' <<<$file)
+
+    app=$(awk '{print $1}' <<<$buffer)
+    size=$(awk '{print $2}' <<<$buffer)
+    branch=$(awk '{print $3}' <<<$buffer)
+    l1d_p=$(awk '{print $4}' <<<$buffer)
+    l2_p=$(awk '{print $6}' <<<$buffer)
+    llc_p=$(awk '{print $7}' <<<$buffer)
+    llc_repl=$(awk '{print $8}' <<<$buffer)
+
+    line=${app##*.},${size%%.*},${branch},${l1d_p},${l2_p},${llc_p},${llc_repl},
+
+    buffer=$(grep "CPU 0 cumulative" $file)
+    insts=$(awk '{print $7}' <<<$buffer)
+    cycles=$(awk '{print $9}' <<<$buffer)
+    ipc=$(awk '{print $5}' <<<$buffer)
+
+    line+=${insts},${cycles},${ipc},
+
+    buffer=$(grep "L1D TOTAL" $file)
+    l1d_hit=$(awk '{print $6}' <<<$buffer)
+    l1d_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1d_hit},${l1d_miss},
+
+    buffer=$(grep "L1D PREFETCH  REQUESTED:" $file)
+    l1d_iss=$(awk '{print $6}' <<<$buffer)
+    l1d_usef=$(awk '{print $8}' <<<$buffer)
+    l1d_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1d_iss},${l1d_usef},${l1d_less},
+
+    buffer=$(grep "L1D AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    buffer=$(grep "L2C TOTAL" $file)
+    l1d_hit=$(awk '{print $6}' <<<$buffer)
+    l1d_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1d_hit},${l1d_miss},
+
+    buffer=$(grep "L2C PREFETCH  REQUESTED:" $file)
+    l1d_iss=$(awk '{print $6}' <<<$buffer)
+    l1d_usef=$(awk '{print $8}' <<<$buffer)
+    l1d_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1d_iss},${l1d_usef},${l1d_less},
+
+    buffer=$(grep "L2C AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    buffer=$(grep "LLC TOTAL" $file)
+    l1d_hit=$(awk '{print $6}' <<<$buffer)
+    l1d_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1d_hit},${l1d_miss},
+
+    buffer=$(grep "LLC PREFETCH  REQUESTED:" $file)
+    l1d_iss=$(awk '{print $6}' <<<$buffer)
+    l1d_usef=$(awk '{print $8}' <<<$buffer)
+    l1d_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1d_iss},${l1d_usef},${l1d_less},
+
+    buffer=$(grep "LLC AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    buffer=$(grep "CPU 0 Branch Prediction" $file)
+
+    branch_acc=$(awk '{print $6}' <<<$buffer | tr -d '%')
+    mpki=$(awk '{print $8}' <<<$buffer)
+
+    line+=${branch_acc},${mpki},
+
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_DIRECT_JUMP:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_INDIRECT:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_CONDITIONAL:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_DIRECT_CALL:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_INDIRECT_CALL:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_RETURN:" $file) | tr -d '%')
+
+    echo $line >> $OUT_FILE
+    echo "finished this line, yay!"
+done
+
+echo "i'm done!"
+#+end_src
+
+#+RESULTS:
+#+begin_example
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+i'm done!
+#+end_example
 
 *** Analysis
 
-Placeholder
+Let's explore this data...
 
-** 4 - Our processor                                                 :EXP04:
+#+begin_src R :session :results output :exports both
+suppressMessages(library(tidyverse))
+options(crayon.enabled = FALSE)
+
+df <- read_csv("../results_200M/base_results.csv")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Parsed with column specification:
+cols(
+  .default = col_double(),
+  application = col_character(),
+  size = col_character(),
+  branch = col_character(),
+  l1d_pref = col_character(),
+  l2c_pref = col_character(),
+  llc_pref = col_character(),
+  llc_rep = col_character()
+)
+See spec(...) for full column specifications.
+#+end_example
+
+Okay, let's compare the IPC then:
+
+#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 800 :height 600
+df %>%
+  select(application, l2c_pref, ipc) %>%
+  ggplot(aes(fill = l2c_pref, y = ipc, x = application)) +
+  geom_col(position = "dodge2", width = 0.75, color = "black") +
+  scale_fill_grey(labels = c("Mediana", "Avançada", "Simples")) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "Instruções Por Clock",
+       fill = "Configuração Base") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/babel-aTk2Pj/figure7RZHA3.png]]
+
+** 2 - Our processor                                                 :EXP02:
 
 Unknown characteristics!
-
-*** Design
-
-Placeholder
-
-*** Script
-
-Placeholder
 
 *** Analysis
 
