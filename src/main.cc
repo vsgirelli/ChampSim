@@ -468,13 +468,13 @@ uint64_t va_to_pa(uint32_t cpu, uint64_t instr_id, uint64_t va, uint64_t unique_
 
     // as a hack for code prefetching, code translations are magical and do not pay these penalties
     if(!is_code)
-      {
-	// if it's data, pay these penalties
-	if (swap)
-	  stall_cycle[cpu] = current_core_cycle[cpu] + SWAP_LATENCY;
-	else
-	  stall_cycle[cpu] = current_core_cycle[cpu] + PAGE_TABLE_LATENCY;
-      }
+    {
+      // if it's data, pay these penalties
+      if (swap)
+        stall_cycle[cpu] = current_core_cycle[cpu] + SWAP_LATENCY;
+      else
+        stall_cycle[cpu] = current_core_cycle[cpu] + PAGE_TABLE_LATENCY;
+    }
 
     //cout << "cpu: " << cpu << " allocated unique_vpage: " << hex << unique_vpage << " to ppage: " << ppage << dec << endl;
 

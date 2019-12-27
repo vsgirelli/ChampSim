@@ -1,0 +1,43 @@
+#include "ooo_cpu.h"
+
+void O3_CPU::l1i_prefetcher_initialize() 
+{
+
+}
+
+void O3_CPU::l1i_prefetcher_branch_operate(uint64_t ip, uint8_t branch_type, uint64_t branch_target)
+{
+  
+}
+
+void O3_CPU::l1i_prefetcher_cache_operate(uint64_t addr, uint8_t cache_hit, uint8_t prefetch_hit)
+{
+  uint64_t pf_addr;
+ 
+  // since the code line prefetch only occurs if there wasn't a cache hit for the desired cache line, we're probably gonna see improvements
+  if((cache_hit == 0) && (L1I.MSHR.occupancy < (L1I.MSHR.SIZE>>1)))
+  {
+    pf_addr = addr + (1<<LOG2_BLOCK_SIZE);
+    prefetch_code_line(addr, pf_addr);
+
+    if((cache_hit == 0) && (L1I.MSHR.occupancy < (L1I.MSHR.SIZE>>1)))
+    {
+      // executes another code line prefetch
+      // the idea is to increase the aggressivity of the instruction prefecher
+      pf_addr = pf_addr + (1<<LOG2_BLOCK_SIZE);
+      prefetch_code_line(addr, pf_addr);
+
+      // no need to change the addr value because it only corresponds to the IP
+    }
+  }
+}
+
+void O3_CPU::l1i_prefetcher_cycle_operate()
+{
+
+}
+
+void O3_CPU::l1i_prefetcher_final_stats()
+{
+
+}

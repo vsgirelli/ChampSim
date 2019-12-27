@@ -52,3 +52,16 @@ Um stat útil: pf_issued.
 
 Sobre o prefetcher kill the program counter prefetcher (kpcp):
 http://hpca23.cse.tamu.edu/pdfs/p737-kim.pdf
+
+
+27/12/19
+Sobre IP based prefetechers:
+http://www.d.umn.edu/~tkwon/course/5315/HW/quadcore/sma.pdf
+Fala sobre o que é um IP based e tbm como a Intel faz o controle de tráfego,
+quando um prefetch é issued e quando não é, etc.
+Se a prefetch queue estiver cheia, novos prefetches sobrescrevem os antigos.
+Isso não acontece no simulador. Em cache.cc:1244 (prefetch_line), se a prefetch
+queue estiver cheia o prefetch é ignorado.
+Os prefetches que chegam à L2 são interpretados como demands normais.
+Como Francis mencionou, tem o tal do prefetcher monitor que "throttles down
+prefetch requests or even stalls the prefetcher".
