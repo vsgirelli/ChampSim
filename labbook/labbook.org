@@ -25,7 +25,7 @@ implement.
 - [[#journal][Journal]]
   - [[#2019-12-25][2019-12-25]]
 - [[#experiments][Experiments]]
-  - [[#1---simple-processor][1 - Simple processor]]
+  - [[#1---base-processors][1 - Base processors]]
     - [[#preprocessing][Preprocessing]]
     - [[#analysis][Analysis]]
   - [[#2---our-processor][2 - Our processor]]
@@ -99,7 +99,7 @@ isn't an issue, I'm thinking of launching as many executions as I can. This
 would speed up the experiments significantly, but would imply in multiple copies
 of the repo.
 
-** 1 - Simple processor                                              :EXP01:
+** 1 - Base processors                                               :EXP01:
 
 The simplest of the bunch:
 
@@ -141,8 +141,6 @@ Cores: 1
 
 In order to analyze the data, we must parse the output files to a more friendly
 =csv= format.
-
-401.bzip2-38B.champsimtrace.xz-bimodal-next_line-next_line-ip_stride-no-lru-1core.txt
 
 #+begin_src bash :exports both :results output :dir ../results_200M/
 OUT_FILE=base_results.csv
@@ -294,7 +292,7 @@ Okay, let's compare the IPC then:
 df %>%
   select(application, l2c_pref, ipc) %>%
   ggplot(aes(fill = l2c_pref, y = ipc, x = application)) +
-  geom_col(position = "dodge2", width = 0.75, color = "black") +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
   scale_fill_grey(labels = c("Mediana", "Avançada", "Simples")) +
   scale_y_continuous(breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
@@ -306,7 +304,7 @@ df %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-aTk2Pj/figure7RZHA3.png]]
+[[file:/tmp/babel-aTk2Pj/figurer6ZnVY.png]]
 
 ** 2 - Our processor                                                 :EXP02:
 
