@@ -6,7 +6,7 @@ if [ "$#" -lt 4 ]; then
     exit 1
 fi
 
-TRACE_DIR=$PWD
+TRACE_DIR=$PWD/trabalho_traces/
 BINARY=${1}
 N_WARM=${2}
 N_SIM=${3}
@@ -41,5 +41,5 @@ if [ ! -f "$TRACE_DIR/$TRACE" ] ; then
     exit 1
 fi
 
-mkdir -p results_${N_SIM}M/$(dirname $TRACE)
+mkdir -p results_${N_SIM}M
 (./bin/${BINARY} -warmup_instructions ${N_WARM}000000 -simulation_instructions ${N_SIM}000000 ${OPTION} -traces ${TRACE_DIR}/${TRACE}) &> results_${N_SIM}M/${TRACE}-${BINARY}${OPTION}.txt
