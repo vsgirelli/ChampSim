@@ -272,6 +272,7 @@ df <- read_csv("../results_200M/base_results.csv")
 
 #+RESULTS:
 #+begin_example
+
 Parsed with column specification:
 cols(
   .default = col_double(),
@@ -289,13 +290,16 @@ See spec(...) for full column specifications.
 Okay, let's compare the IPC then:
 
 #+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 800 :height 600
+suppressMessages(library(wesanderson))
+
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
 
 df %>%
   select(application, l2c_pref, ipc) %>%
   ggplot(aes(fill = l2c_pref, y = ipc, x = application)) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
-  scale_fill_grey(labels = c("Simples", "Mediana", "Avançada")) +
+  scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
+                    labels = c("Simples", "Mediana", "Avançada")) +
   scale_y_continuous(breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
        y = "Instruções Por Clock",
@@ -306,7 +310,232 @@ df %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-aTk2Pj/figurefNQH46.png]]
+[[file:/tmp/babel-LoidVJ/figure1uRe4v.png]]
+
+Cool. Let's look at something more interesting.
+
+#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1200 :height 600
+suppressMessages(library(wesanderson))
+
+df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
+
+df %>%
+  select(application, l2c_pref, l1d_tot_hit) %>%
+  mutate(stat = "hit") %>%
+  rename(value = l1d_tot_hit) -> dfh
+
+df %>%
+  select(application, l2c_pref, l1d_tot_miss) %>%
+  mutate(stat = "miss") %>%
+  rename(value = l1d_tot_miss) -> dfm
+
+df2 <- bind_rows(dfh, dfm)
+
+levels(df2$l2c_pref) <- c("Simples", "Médio", "Avançado")
+
+df2 %>%
+  ggplot(aes(fill = stat, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
+                    labels = c("Hit", "Miss")) +
+  scale_y_log10(
+    expand = expand_scale(mult = c(0, 0.03)),
+    breaks = scales::trans_breaks(n = 8, "log10", function(x) 10^x),
+    labels = scales::trans_format("log10", scales::math_format(10^.x))
+  ) +
+  annotation_logticks(sides = "lr") +
+  facet_grid(. ~ l2c_pref) +
+  labs(x = "Aplicação",
+       y = "Quantidade (log10)",
+       fill = "Acesso à cache nível 1 de dados") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/babel-LoidVJ/figureGgs079.png]]
+
+Now grouping in another way...
+
+#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1000 :height 800
+suppressMessages(library(wesanderson))
+
+df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
+
+df %>%
+  select(application, l2c_pref, l1d_tot_hit) %>%
+  mutate(stat = "Hit", l1d_tot_hit = l1d_tot_hit / 1000000) %>%
+  rename(value = l1d_tot_hit) -> dfh
+
+df %>%
+  select(application, l2c_pref, l1d_tot_miss) %>%
+  mutate(stat = "Miss", l1d_tot_miss = l1d_tot_miss / 1000000) %>%
+  rename(value = l1d_tot_miss) -> dfm
+
+df2 <- bind_rows(dfh, dfm)
+
+levels(df2$l2c_pref) <- c("Simples", "Médio", "Avançado")
+
+df2 %>%
+  ggplot(aes(fill = l2c_pref, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
+                    labels = c("Simples", "Médio", "Avançado")) +
+  ## scale_y_log10(
+  ##   expand = expand_scale(mult = c(0, 0.03)),
+  ##   breaks = scales::trans_breaks(n = 8, "log10", function(x) 10^x),
+  ##   labels = scales::trans_format("log10", scales::math_format(10^.x))
+  ## ) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  ## annotation_logticks(sides = "lr") +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Quantidade [x10^6]",
+       fill = "Acesso à cache nível 1 de dados") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/babel-LoidVJ/figureP1G0gI.png]]
+
+Now let's see some relative misses...
+
+#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 900 :height 500
+suppressMessages(library(wesanderson))
+
+df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
+
+df %>%
+  select(application, l2c_pref, l1d_tot_hit, l1d_tot_miss) %>%
+  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfl1
+
+df %>%
+  select(application, l2c_pref, l2c_tot_hit, l2c_tot_miss) %>%
+  mutate(stat = "L2C", value = l2c_tot_miss / l2c_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfl2
+
+df %>%
+  select(application, l2c_pref, llc_tot_hit, llc_tot_miss) %>%
+  mutate(stat = "LLC", value = llc_tot_miss / llc_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfll
+
+df2 <- dfl1
+
+levels(df2$l2c_pref) <- c("Simples", "Médio", "Avançado")
+
+df2 %>%
+  ggplot(aes(fill = l2c_pref, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
+                    labels = c("Simples", "Médio", "Avançado")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Misses / Hits",
+       fill = "Misses relativos na L1D") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/babel-LoidVJ/figurekT1NCu.png]]
+
+#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 900 :height 500
+suppressMessages(library(wesanderson))
+
+df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
+
+df %>%
+  select(application, l2c_pref, l1d_tot_hit, l1d_tot_miss) %>%
+  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfl1
+
+df %>%
+  select(application, l2c_pref, l2c_tot_hit, l2c_tot_miss) %>%
+  mutate(stat = "L2C", value = l2c_tot_miss / l2c_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfl2
+
+df %>%
+  select(application, l2c_pref, llc_tot_hit, llc_tot_miss) %>%
+  mutate(stat = "LLC", value = llc_tot_miss / llc_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfll
+
+df2 <- dfl2
+
+levels(df2$l2c_pref) <- c("Simples", "Médio", "Avançado")
+
+df2 %>%
+  ggplot(aes(fill = l2c_pref, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
+                    labels = c("Simples", "Médio", "Avançado")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Misses / Hits",
+       fill = "Misses relativos na L2C") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/babel-LoidVJ/figureYR79Un.png]]
+
+#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 900 :height 500
+suppressMessages(library(wesanderson))
+
+df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
+
+df %>%
+  select(application, l2c_pref, l1d_tot_hit, l1d_tot_miss) %>%
+  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfl1
+
+df %>%
+  select(application, l2c_pref, l2c_tot_hit, l2c_tot_miss) %>%
+  mutate(stat = "L2C", value = l2c_tot_miss / l2c_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfl2
+
+df %>%
+  select(application, l2c_pref, llc_tot_hit, llc_tot_miss) %>%
+  mutate(stat = "LLC", value = llc_tot_miss / llc_tot_hit) %>%
+  select(application, l2c_pref, stat, value) -> dfll
+
+df2 <- dfll
+
+levels(df2$l2c_pref) <- c("Simples", "Médio", "Avançado")
+
+df2 %>%
+  ggplot(aes(fill = l2c_pref, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
+                    labels = c("Simples", "Médio", "Avançado")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Misses / Hits",
+       fill = "Misses relativos na LLC") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/babel-LoidVJ/figureQBhv6p.png]]
 
 ** 2 - Our processor                                                 :EXP02:
 
