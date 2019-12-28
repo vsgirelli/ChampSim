@@ -65,3 +65,15 @@ queue estiver cheia o prefetch é ignorado.
 Os prefetches que chegam à L2 são interpretados como demands normais.
 Como Francis mencionou, tem o tal do prefetcher monitor que "throttles down
 prefetch requests or even stalls the prefetcher".
+
+
+Implementando a versão de l1i aggressive, obtivemos:
+Para o bzip2:
+IPC bimodal no no no no lru: 1.0164
+IPC bimodal next_line2 next_line no no lru: 1.06324
+IPC bimodal next_line next_line no no lru: 1.06319
+IPC bimodal next_line next_line ip_stride no lru: 1.0788
+Desse modo, nossa versão não obteve melhoras pra essa app.
+
+Quanto ao gcc, todos os prefetchers com exceção do perceptron apresentaram
+piora.
