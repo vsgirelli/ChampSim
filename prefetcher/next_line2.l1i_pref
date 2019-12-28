@@ -17,11 +17,13 @@ void O3_CPU::l1i_prefetcher_cache_operate(uint64_t addr, uint8_t cache_hit, uint
   // since the code line prefetch only occurs if there wasn't a cache hit for the desired cache line, we're probably gonna see improvements
   if((cache_hit == 0) && (L1I.MSHR.occupancy < (L1I.MSHR.SIZE>>1)))
   {
+    fprintf(stdout, "Preftching instruction 1\n");
     pf_addr = addr + (1<<LOG2_BLOCK_SIZE);
     prefetch_code_line(addr, pf_addr);
 
     if((cache_hit == 0) && (L1I.MSHR.occupancy < (L1I.MSHR.SIZE>>1)))
     {
+      fprintf(stdout, "Preftching instruction 2\n");
       // executes another code line prefetch
       // the idea is to increase the aggressivity of the instruction prefecher
       pf_addr = pf_addr + (1<<LOG2_BLOCK_SIZE);
