@@ -15,7 +15,7 @@ rm -rf $SCRATCH/ChampSim/
 cp -r $HOME/ChampSim/ $SCRATCH
 cd $SCRATCH/ChampSim/
 
-./run_champsim.sh $machine 5 200 $app
+./run_champsim.sh $machine 50 200 $app
 
 cp -r ./results_200M $HOME/ChampSim/
 date
