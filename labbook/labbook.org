@@ -28,8 +28,10 @@ implement.
   - [[#1---base-processors][1 - Base processors]]
     - [[#preprocessing][Preprocessing]]
     - [[#analysis][Analysis]]
-  - [[#2---our-processor][2 - Our processor]]
+  - [[#2---instruction-prefetch][2 - Instruction Prefetch]]
     - [[#analysis-1][Analysis]]
+  - [[#3---stream][3 - Stream]]
+    - [[#analysis-2][Analysis]]
 
 * Journal
 
@@ -142,7 +144,7 @@ Cores: 1
 In order to analyze the data, we must parse the output files to a more friendly
 =csv= format.
 
-#+begin_src bash :exports both :results output :dir ../results_200M/
+#+begin_src bash :exports both :results output :dir ../results_base/
 OUT_FILE=base_results.csv
 
 echo "application,size,branch,l1d_pref,l2c_pref,llc_pref,llc_rep,inst,cycles,ipc,l1d_tot_hit,l1d_tot_miss,l1d_pref_issued,l1d_pref_useful,l1d_pref_useless,l1d_lat,l2c_tot_hit,l2c_tot_miss,l2c_pref_issued,l2c_pref_useful,l2c_pref_useless,l2c_lat,llc_tot_hit,llc_tot_miss,llc_pref_issued,llc_pref_useful,llc_pref_useless,llc_lat,branch_acc,mpki,branch_direct,branch_indirect,branch_cond,branch_dir_call,branch_ind_call,branch_ret" > $OUT_FILE
@@ -267,7 +269,7 @@ Let's explore this data...
 suppressMessages(library(tidyverse))
 options(crayon.enabled = FALSE)
 
-df <- read_csv("../results_200M/base_results.csv")
+df <- read_csv("../results_base/base_results.csv")
 #+end_src
 
 #+RESULTS:
@@ -289,7 +291,7 @@ See spec(...) for full column specifications.
 
 Okay, let's compare the IPC then:
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 800 :height 600
+#+begin_src R :session :results output graphics :file images/base/ipc.png :exports both :width 800 :height 600
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -311,11 +313,11 @@ df %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figureBWqi0B.png]]
+[[file:images/base/ipc.png]]
 
 Cool. Let's look at something more interesting.
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1200 :height 600
+#+begin_src R :session :results output graphics :file images/base/hitmiss_l1d_log.png :exports both :width 1200 :height 600
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -355,11 +357,11 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figureGgs079.png]]
+[[file:images/base/hitmiss_l1d_log.png]]
 
 Now grouping in another way...
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1000 :height 800
+#+begin_src R :session :results output graphics :file images/base/hitmiss_l1d.png :exports both :width 1000 :height 800
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -402,11 +404,11 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figureP1G0gI.png]]
+[[file:images/base/hitmiss_l1d.png]]
 
 Now let's see some relative misses...
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 900 :height 500
+#+begin_src R :session :results output graphics :file images/base/relmiss_l1d.png :exports both :width 900 :height 500
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -448,9 +450,9 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figurekT1NCu.png]]
+[[file:images/base/relmiss_l1d.png]]
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 900 :height 500
+#+begin_src R :session :results output graphics :file images/base/relmiss_l2c.png :exports both :width 900 :height 500
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -492,9 +494,9 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figureYR79Un.png]]
+[[file:images/base/relmiss_l2c.png]]
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 900 :height 500
+#+begin_src R :session :results output graphics :file images/base/relmiss_llc.png :exports both :width 900 :height 500
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -536,11 +538,11 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figureQBhv6p.png]]
+[[file:images/base/relmiss_llc.png]]
 
 Nice, now MPKI...
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 800 :height 600
+#+begin_src R :session :results output graphics :file images/base/mpki.png :exports both :width 800 :height 600
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -562,11 +564,11 @@ df %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figurehIjeh7.png]]
+[[file:images/base/mpki.png]]
 
 I think it'd be cool to see the useful vs useless prefetchs...
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1000 :height 900
+#+begin_src R :session :results output graphics :file images/base/useful_l1d.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -605,9 +607,9 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figureKVhHMY.png]]
+[[file:images/base/useful_l1d.png]]
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1000 :height 900
+#+begin_src R :session :results output graphics :file images/base/useful_l2c.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -646,9 +648,9 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figurej1zeOD.png]]
+[[file:images/base/useful_l2c.png]]
 
-#+begin_src R :session :results output graphics :file (org-babel-temp-file "figure" ".png") :exports both :width 1000 :height 900
+#+begin_src R :session :results output graphics :file images/base/useful_llc.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -687,11 +689,17 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:/tmp/babel-LoidVJ/figure7fgB6d.png]]
+[[file:images/base/useful_llc.png]]
 
-** 2 - Our processor                                                 :EXP02:
+** 2 - Instruction Prefetch                                          :EXP02:
 
-Unknown characteristics!
+Realized with the modified =next_line2= for the L1I.
+
+*** Analysis
+
+Placeholder
+
+** 3 - Stream                                                        :EXP03:
 
 *** Analysis
 
