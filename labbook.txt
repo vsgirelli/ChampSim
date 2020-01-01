@@ -77,3 +77,9 @@ Desse modo, nossa versão não obteve melhoras pra essa app.
 
 Quanto ao gcc, todos os prefetchers com exceção do perceptron apresentaram
 piora.
+
+
+30/12/19
+Nota sobre os fill levels: identifiquei em cache.cc:568 que o lower level é o
+nível de cache/memória que ta mais afastado do proc. Por ex, a L2 é o lower
+level da L1.
