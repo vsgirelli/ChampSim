@@ -920,6 +920,7 @@ cols(
   application = col_character(),
   size = col_character(),
   branch = col_character(),
+  l1i_pref = col_character(),
   l1d_pref = col_character(),
   l2c_pref = col_character(),
   llc_pref = col_character(),
@@ -933,6 +934,7 @@ cols(
   application = col_character(),
   size = col_character(),
   branch = col_character(),
+  l1i_pref = col_character(),
   l1d_pref = col_character(),
   l2c_pref = col_character(),
   llc_pref = col_character(),
@@ -968,7 +970,6 @@ df %>%
 #+RESULTS:
 [[file:images/test/ipc.png]]
 
-
 Given MPKI metric:
 
 #+begin_src R :session :results output graphics :file images/test/mpki.png :exports both :width 800 :height 700
@@ -996,7 +997,34 @@ df %>%
 #+RESULTS:
 [[file:images/test/mpki.png]]
 
-Now, let's do it by hand:
+Now, let's do it by hand (for L1I):
+
+#+begin_src R :session :results output graphics :file images/test/mpki_hand.png :exports both :width 800 :height 700
+suppressMessages(library(wesanderson))
+
+df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+
+df %>%
+  select(application, config, l1i_tot_miss, inst) %>%
+  filter(application != "povray") %>%
+  mutate(mpki = l1i_tot_miss / (inst / 1000)) %>%
+  ggplot(aes(fill = as.factor(config), y = mpki, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.05)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "MPKI",
+       fill = "Configuração",
+       title = "MPKI conforme configuração",
+       subtitle = "para o segundo experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/test/mpki_hand.png]]
 
 ** 3 - Data Prefetcher                                               :EXP03:
 
@@ -1185,6 +1213,7 @@ cols(
   application = col_character(),
   size = col_character(),
   branch = col_character(),
+  l1i_pref = col_character(),
   l1d_pref = col_character(),
   l2c_pref = col_character(),
   llc_pref = col_character(),
@@ -1198,6 +1227,7 @@ cols(
   application = col_character(),
   size = col_character(),
   branch = col_character(),
+  l1i_pref = col_character(),
   l1d_pref = col_character(),
   l2c_pref = col_character(),
   llc_pref = col_character(),
@@ -1255,3 +1285,29 @@ df %>%
 
 #+RESULTS:
 [[file:images/stream/mpki.png]]
+
+#+begin_src R :session :results output graphics :file images/stream/mpki_hand.png :exports both :width 800 :height 700
+suppressMessages(library(wesanderson))
+
+df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+
+df %>%
+  select(application, config, l1d_tot_miss, inst) %>%
+  mutate(mpki = l1d_tot_miss / (inst / 1000)) %>%
+  ggplot(aes(fill = as.factor(config), y = mpki, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.05)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "MPKI",
+       fill = "Configuração",
+       title = "MPKI conforme configuração",
+       subtitle = "para o segundo experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream/mpki_hand.png]]
