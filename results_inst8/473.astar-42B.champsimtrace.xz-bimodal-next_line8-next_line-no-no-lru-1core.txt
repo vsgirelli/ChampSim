@@ -1,0 +1,399 @@
+
+*** ChampSim Multicore Out-of-Order Simulator ***
+
+Warmup Instructions: 50000000
+Simulation Instructions: 200000000
+Number of CPUs: 1
+LLC sets: 2048
+LLC ways: 16
+Off-chip DRAM Size: 4096 MB Channels: 1 Width: 64-bit Data Rate: 3200 MT/s
+
+CPU 0 runs /scratch/vsgirelli/ChampSim/trabalho_traces//473.astar-42B.champsimtrace.xz
+CPU 0 Bimodal branch predictor
+CPU 0 L1D next line prefetcher
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Heartbeat CPU 0 instructions: 10000002 cycles: 3572457 heartbeat IPC: 2.79919 cumulative IPC: 2.79919 (Simulation time: 0 hr 0 min 31 sec) 
+Heartbeat CPU 0 instructions: 20000002 cycles: 7106546 heartbeat IPC: 2.82958 cumulative IPC: 2.81431 (Simulation time: 0 hr 1 min 2 sec) 
+Heartbeat CPU 0 instructions: 30000001 cycles: 10655977 heartbeat IPC: 2.81735 cumulative IPC: 2.81532 (Simulation time: 0 hr 1 min 34 sec) 
+Heartbeat CPU 0 instructions: 40000001 cycles: 14216929 heartbeat IPC: 2.80824 cumulative IPC: 2.81355 (Simulation time: 0 hr 2 min 5 sec) 
+Heartbeat CPU 0 instructions: 50000001 cycles: 17773646 heartbeat IPC: 2.81158 cumulative IPC: 2.81315 (Simulation time: 0 hr 2 min 37 sec) 
+
+Warmup complete CPU 0 instructions: 50000001 cycles: 17773646 (Simulation time: 0 hr 2 min 37 sec) 
+
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Heartbeat CPU 0 instructions: 60000000 cycles: 40946784 heartbeat IPC: 0.431534 cumulative IPC: 0.431534 (Simulation time: 0 hr 2 min 59 sec) 
+Heartbeat CPU 0 instructions: 70000002 cycles: 65658454 heartbeat IPC: 0.404667 cumulative IPC: 0.417669 (Simulation time: 0 hr 3 min 21 sec) 
+Heartbeat CPU 0 instructions: 80000002 cycles: 95953864 heartbeat IPC: 0.330083 cumulative IPC: 0.383729 (Simulation time: 0 hr 3 min 44 sec) 
+Heartbeat CPU 0 instructions: 90000000 cycles: 127318086 heartbeat IPC: 0.318835 cumulative IPC: 0.365149 (Simulation time: 0 hr 4 min 7 sec) 
+Heartbeat CPU 0 instructions: 100000000 cycles: 152842848 heartbeat IPC: 0.391776 cumulative IPC: 0.370181 (Simulation time: 0 hr 4 min 30 sec) 
+Heartbeat CPU 0 instructions: 110000000 cycles: 179416323 heartbeat IPC: 0.376315 cumulative IPC: 0.371189 (Simulation time: 0 hr 4 min 53 sec) 
+Heartbeat CPU 0 instructions: 120000000 cycles: 218294752 heartbeat IPC: 0.257212 cumulative IPC: 0.34909 (Simulation time: 0 hr 5 min 17 sec) 
+Heartbeat CPU 0 instructions: 130000001 cycles: 258679024 heartbeat IPC: 0.247621 cumulative IPC: 0.332081 (Simulation time: 0 hr 5 min 41 sec) 
+Preftching instruction 1
+Preftching instruction 2
+Heartbeat CPU 0 instructions: 140000000 cycles: 284948216 heartbeat IPC: 0.380674 cumulative IPC: 0.336858 (Simulation time: 0 hr 6 min 4 sec) 
+Heartbeat CPU 0 instructions: 150000001 cycles: 308508609 heartbeat IPC: 0.424441 cumulative IPC: 0.343956 (Simulation time: 0 hr 6 min 27 sec) 
+Heartbeat CPU 0 instructions: 160000000 cycles: 332248163 heartbeat IPC: 0.421238 cumulative IPC: 0.34979 (Simulation time: 0 hr 6 min 49 sec) 
+Heartbeat CPU 0 instructions: 170000000 cycles: 362386820 heartbeat IPC: 0.3318 cumulative IPC: 0.348217 (Simulation time: 0 hr 7 min 13 sec) 
+Heartbeat CPU 0 instructions: 180000000 cycles: 398177829 heartbeat IPC: 0.2794 cumulative IPC: 0.341742 (Simulation time: 0 hr 7 min 37 sec) 
+Heartbeat CPU 0 instructions: 190000000 cycles: 436877839 heartbeat IPC: 0.258398 cumulative IPC: 0.334046 (Simulation time: 0 hr 8 min 1 sec) 
+Heartbeat CPU 0 instructions: 200000001 cycles: 475622021 heartbeat IPC: 0.258103 cumulative IPC: 0.327619 (Simulation time: 0 hr 8 min 26 sec) 
+Heartbeat CPU 0 instructions: 210000002 cycles: 508627590 heartbeat IPC: 0.302979 cumulative IPC: 0.325963 (Simulation time: 0 hr 8 min 50 sec) 
+Heartbeat CPU 0 instructions: 220000000 cycles: 531734534 heartbeat IPC: 0.43277 cumulative IPC: 0.330764 (Simulation time: 0 hr 9 min 12 sec) 
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Preftching instruction 1
+Preftching instruction 2
+Heartbeat CPU 0 instructions: 230000001 cycles: 556282111 heartbeat IPC: 0.407372 cumulative IPC: 0.334257 (Simulation time: 0 hr 9 min 35 sec) 
+Heartbeat CPU 0 instructions: 240000000 cycles: 579455381 heartbeat IPC: 0.431532 cumulative IPC: 0.33827 (Simulation time: 0 hr 9 min 57 sec) 
+Heartbeat CPU 0 instructions: 250000003 cycles: 605700808 heartbeat IPC: 0.381019 cumulative IPC: 0.340178 (Simulation time: 0 hr 10 min 20 sec) 
+Finished CPU 0 instructions: 200000002 cycles: 587927162 cumulative IPC: 0.340178 (Simulation time: 0 hr 10 min 20 sec) 
+
+ChampSim completed all CPUs
+
+Region of Interest Statistics
+
+CPU 0 cumulative IPC: 0.340178 instructions: 200000002 cycles: 587927162
+L1D TOTAL     ACCESS:   84774776  HIT:   74129226  MISS:   10645550
+L1D LOAD      ACCESS:   41410466  HIT:   36318138  MISS:    5092328
+L1D RFO       ACCESS:    8496254  HIT:    8396721  MISS:      99533
+L1D PREFETCH  ACCESS:   34868056  HIT:   29414367  MISS:    5453689
+L1D WRITEBACK ACCESS:          0  HIT:          0  MISS:          0
+L1D PREFETCH  REQUESTED:  218783712  ISSUED:   45328322  USEFUL:     817247  USELESS:    5983029
+L1D AVERAGE MISS LATENCY: 43.4164 cycles
+L1I TOTAL     ACCESS:   39541447  HIT:   39541307  MISS:        140
+L1I LOAD      ACCESS:   39541341  HIT:   39541270  MISS:         71
+L1I RFO       ACCESS:          0  HIT:          0  MISS:          0
+L1I PREFETCH  ACCESS:        106  HIT:         37  MISS:         69
+L1I WRITEBACK ACCESS:          0  HIT:          0  MISS:          0
+L1I PREFETCH  REQUESTED:        300  ISSUED:        300  USEFUL:         47  USELESS:          0
+L1I AVERAGE MISS LATENCY: 185.464 cycles
+L2C TOTAL     ACCESS:   12570981  HIT:    7251540  MISS:    5319441
+L2C LOAD      ACCESS:    5076555  HIT:    2499643  MISS:    2576912
+L2C RFO       ACCESS:      99531  HIT:      74141  MISS:      25390
+L2C PREFETCH  ACCESS:    5469502  HIT:    2752424  MISS:    2717078
+L2C WRITEBACK ACCESS:    1925393  HIT:    1925332  MISS:         61
+L2C PREFETCH  REQUESTED:          0  ISSUED:          0  USEFUL:     140077  USELESS:    3236256
+L2C AVERAGE MISS LATENCY: 51.6879 cycles
+LLC TOTAL     ACCESS:    6333863  HIT:    5722163  MISS:     611700
+LLC LOAD      ACCESS:    2576877  HIT:    2319146  MISS:     257731
+LLC RFO       ACCESS:      25390  HIT:      24673  MISS:        717
+LLC PREFETCH  ACCESS:    2717071  HIT:    2364175  MISS:     352896
+LLC WRITEBACK ACCESS:    1014525  HIT:    1014169  MISS:        356
+LLC PREFETCH  REQUESTED:          0  ISSUED:          0  USEFUL:     141753  USELESS:     315330
+LLC AVERAGE MISS LATENCY: 169.204 cycles
+Major fault: 0 Minor fault: 5938
+CPU 0 L1D next line prefetcher final stats
+
+DRAM Statistics
+ CHANNEL 0
+ RQ ROW_BUFFER_HIT:     112000  ROW_BUFFER_MISS:     499313
+ DBUS_CONGESTED:     106148
+ WQ ROW_BUFFER_HIT:      20169  ROW_BUFFER_MISS:     273672  FULL:          0
+
+ AVG_CONGESTED_CYCLE: 4
+
+CPU 0 Branch Prediction Accuracy: 72.2344% MPKI: 52.4127 Average ROB Occupancy at Mispredict: 4.05664
+
+Branch types
+NOT_BRANCH: 162246001 81.123%
+BRANCH_DIRECT_JUMP: 26872 0.013436%
+BRANCH_INDIRECT: 0 0%
+BRANCH_CONDITIONAL: 37717796 18.8589%
+BRANCH_DIRECT_CALL: 4489 0.0022445%
+BRANCH_INDIRECT_CALL: 0 0%
+BRANCH_RETURN: 4489 0.0022445%
+BRANCH_OTHER: 0 0%
+
