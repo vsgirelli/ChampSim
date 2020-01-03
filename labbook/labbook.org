@@ -735,6 +735,16 @@ df2 %>%
 
 Realized with the modified =next_line2= for the L1I.
 
+#+begin_example
+Branch Predictor: bimodal
+L1D Prefetcher: next_line
+L1I Prefetcher: next_line2
+L2C Prefetcher: no
+LLC Prefetcher: no
+LLC Replacement: lru
+Cores: 1
+#+end_example
+
 *** Preprocessing
 
 Again, a script...
@@ -1006,7 +1016,6 @@ df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Pr
 
 df %>%
   select(application, config, l1i_tot_miss, inst) %>%
-  filter(application != "povray") %>%
   mutate(mpki = l1i_tot_miss / (inst / 1000)) %>%
   ggplot(aes(fill = as.factor(config), y = mpki, x = as.factor(application))) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
@@ -1017,7 +1026,7 @@ df %>%
        y = "MPKI",
        fill = "Configuração",
        title = "MPKI conforme configuração",
-       subtitle = "para o segundo experimento") +
+       subtitle = "na L1I para o segundo experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
@@ -1026,7 +1035,89 @@ df %>%
 #+RESULTS:
 [[file:images/test/mpki_hand.png]]
 
+Now some hit and misses metrics for L1I:
+
+#+begin_src R :session :results output graphics :file images/test/hitmiss_l1i.png :exports both :width 1000 :height 900
+suppressMessages(library(wesanderson))
+
+df %>%
+  select(application, config, l1i_tot_hit) %>%
+  mutate(stat = "Hit", l1i_tot_hit = l1i_tot_hit / 1000000) %>%
+  rename(value = l1i_tot_hit) -> dfh
+
+df %>%
+  select(application, config, l1i_tot_miss) %>%
+  mutate(stat = "Miss", l1i_tot_miss = l1i_tot_miss / 1000000) %>%
+  rename(value = l1i_tot_miss) -> dfm
+
+df2 <- bind_rows(dfh, dfm)
+
+df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+
+df2 %>%
+  ggplot(aes(fill = as.factor(config), y = value, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Quantidade [x10^6]",
+       fill = "Configuração",
+       title = "Acessos à cache nível 1 de instruções",
+       subtitle = "conforme hit ou miss para o segundo experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/test/hitmiss_l1i.png]]
+
+And relative misses...
+
+#+begin_src R :session :results output graphics :file images/test/relmiss_l1i.png :exports both :width 900 :height 600
+suppressMessages(library(wesanderson))
+
+df %>%
+  select(application, config, l1i_tot_hit, l1i_tot_miss) %>%
+  mutate(stat = "L1I", value = l1i_tot_miss / l1i_tot_hit) %>%
+  select(application, config, stat, value) -> df2
+
+df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+
+df2 %>%
+  ggplot(aes(fill = config, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "Misses / Hits",
+       fill = "Configuração",
+       title = "Misses relativos na L1I",
+       subtitle = "para o segundo experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/test/relmiss_l1i.png]]
+
 ** 3 - Data Prefetcher                                               :EXP03:
+
+#+begin_example
+Branch Predictor: bimodal
+L1D Prefetcher: next_line2
+L1I Prefetcher: next_line
+L2C Prefetcher: no
+LLC Prefetcher: no
+LLC Replacement: lru
+Cores: 1
+#+end_example
 
 *** Preprocessing
 
@@ -1236,6 +1327,8 @@ cols(
 See spec(...) for full column specifications.
 #+end_example
 
+Starting with IPC
+
 #+begin_src R :session :results output graphics :file images/stream/ipc.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
@@ -1257,6 +1350,11 @@ df %>%
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
 #+end_src
+
+#+RESULTS:
+[[file:images/stream/ipc.png]]
+
+then given MPKI
 
 #+RESULTS:
 [[file:images/stream/ipc.png]]
@@ -1286,6 +1384,11 @@ df %>%
 #+RESULTS:
 [[file:images/stream/mpki.png]]
 
+and by hand MPKI
+
+#+RESULTS:
+[[file:images/stream/mpki.png]]
+
 #+begin_src R :session :results output graphics :file images/stream/mpki_hand.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
@@ -1303,7 +1406,7 @@ df %>%
        y = "MPKI",
        fill = "Configuração",
        title = "MPKI conforme configuração",
-       subtitle = "para o segundo experimento") +
+       subtitle = "na L1D para o terceiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
@@ -1311,3 +1414,75 @@ df %>%
 
 #+RESULTS:
 [[file:images/stream/mpki_hand.png]]
+
+Now some hit and misses metrics for L1D:
+
+#+begin_src R :session :results output graphics :file images/stream/hitmiss_l1d.png :exports both :width 1000 :height 900
+suppressMessages(library(wesanderson))
+
+df %>%
+  select(application, config, l1d_tot_hit) %>%
+  mutate(stat = "Hit", l1d_tot_hit = l1d_tot_hit / 1000000) %>%
+  rename(value = l1d_tot_hit) -> dfh
+
+df %>%
+  select(application, config, l1d_tot_miss) %>%
+  mutate(stat = "Miss", l1d_tot_miss = l1d_tot_miss / 1000000) %>%
+  rename(value = l1d_tot_miss) -> dfm
+
+df2 <- bind_rows(dfh, dfm)
+
+df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+
+df2 %>%
+  ggplot(aes(fill = as.factor(config), y = value, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Quantidade [x10^6]",
+       fill = "Configuração",
+       title = "Acessos à cache nível 1 de dados",
+       subtitle = "conforme hit ou miss para o terceiro experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream/hitmiss_l1d.png]]
+
+And relative misses...
+
+#+begin_src R :session :results output graphics :file images/stream/relmiss_l1d.png :exports both :width 900 :height 600
+suppressMessages(library(wesanderson))
+
+df %>%
+  select(application, config, l1d_tot_hit, l1d_tot_miss) %>%
+  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
+  select(application, config, stat, value) -> df2
+
+df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+
+df2 %>%
+  ggplot(aes(fill = config, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "Misses / Hits",
+       fill = "Configuração",
+       title = "Misses relativos na L1D",
+       subtitle = "para o terceiro experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream/relmiss_l1d.png]]
