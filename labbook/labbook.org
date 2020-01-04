@@ -324,6 +324,7 @@ cols(
   application = col_character(),
   size = col_character(),
   branch = col_character(),
+  l1i_pref = col_character(),
   l1d_pref = col_character(),
   l2c_pref = col_character(),
   llc_pref = col_character(),
@@ -334,7 +335,7 @@ See spec(...) for full column specifications.
 
 Okay, let's compare the IPC then:
 
-#+begin_src R :session :results output graphics :file images/base/ipc.png :exports both :width 800 :height 600
+#+begin_src R :session :results output graphics :file images/base/ipc.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -349,7 +350,9 @@ df %>%
                      breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
        y = "Instruções Por Ciclo",
-       fill = "Configuração Base") +
+       fill = "Configuração",
+       title = "IPC conforme configuração",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
@@ -404,7 +407,7 @@ df2 %>%
 
 Now grouping in another way...
 
-#+begin_src R :session :results output graphics :file images/base/hitmiss_l1d.png :exports both :width 1000 :height 800
+#+begin_src R :session :results output graphics :file images/base/hitmiss_l1d.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -428,18 +431,14 @@ df2 %>%
   geom_col(position = "dodge2", width = 0.6, color = "black") +
   scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
                     labels = c("Simples", "Médio", "Avançado")) +
-  ## scale_y_log10(
-  ##   expand = expand_scale(mult = c(0, 0.03)),
-  ##   breaks = scales::trans_breaks(n = 8, "log10", function(x) 10^x),
-  ##   labels = scales::trans_format("log10", scales::math_format(10^.x))
-  ## ) +
   scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
                      breaks = scales::pretty_breaks(n = 8)) +
-  ## annotation_logticks(sides = "lr") +
   facet_grid(stat ~ .) +
   labs(x = "Aplicação",
        y = "Quantidade [x10^6]",
-       fill = "Acesso à cache nível 1 de dados") +
+       fill = "Acesso à cache nível 1 de dados",
+       title = "Quantidade de acessos à cache nível 1 de dados",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -451,7 +450,7 @@ df2 %>%
 
 Now let's see some relative misses...
 
-#+begin_src R :session :results output graphics :file images/base/relmiss_l1d.png :exports both :width 900 :height 500
+#+begin_src R :session :results output graphics :file images/base/relmiss_l1d.png :exports both :width 900 :height 600
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -485,7 +484,9 @@ df2 %>%
   facet_grid(stat ~ .) +
   labs(x = "Aplicação",
        y = "Misses / Hits",
-       fill = "Misses relativos na L1D") +
+       fill = "Configuração",
+       title = "Misses relativos na L1D",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -495,7 +496,7 @@ df2 %>%
 #+RESULTS:
 [[file:images/base/relmiss_l1d.png]]
 
-#+begin_src R :session :results output graphics :file images/base/relmiss_l2c.png :exports both :width 900 :height 500
+#+begin_src R :session :results output graphics :file images/base/relmiss_l2c.png :exports both :width 900 :height 600
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -529,7 +530,9 @@ df2 %>%
   facet_grid(stat ~ .) +
   labs(x = "Aplicação",
        y = "Misses / Hits",
-       fill = "Misses relativos na L2C") +
+       fill = "Configuração",
+       title = "Misses relativos na L2C",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -539,7 +542,7 @@ df2 %>%
 #+RESULTS:
 [[file:images/base/relmiss_l2c.png]]
 
-#+begin_src R :session :results output graphics :file images/base/relmiss_llc.png :exports both :width 900 :height 500
+#+begin_src R :session :results output graphics :file images/base/relmiss_llc.png :exports both :width 900 :height 600
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
@@ -573,7 +576,9 @@ df2 %>%
   facet_grid(stat ~ .) +
   labs(x = "Aplicação",
        y = "Misses / Hits",
-       fill = "Misses relativos na LLC") +
+       fill = "configuração",
+       title = "Misses relativos na LLC",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -585,13 +590,14 @@ df2 %>%
 
 Nice, now MPKI...
 
-#+begin_src R :session :results output graphics :file images/base/mpki.png :exports both :width 800 :height 600
+#+begin_src R :session :results output graphics :file images/base/mpki.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
 df$l2c_pref <- factor(df$l2c_pref, levels = c("no", "ip_stride", "kpcp"))
 
 df %>%
-  select(application, l2c_pref, mpki) %>%
+  select(application, l2c_pref, l1d_tot_miss, l2c_tot_miss, llc_tot_miss, inst) %>%
+  mutate(mpki = (l1d_tot_miss + l2c_tot_miss + llc_tot_miss) * 1000 / inst) %>%
   ggplot(aes(fill = l2c_pref, y = mpki, x = application)) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
   scale_fill_manual(values = wes_palette(n = 3, name = "GrandBudapest1"),
@@ -600,7 +606,9 @@ df %>%
                      breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
        y = "MPKI",
-       fill = "Configuração Base") +
+       fill = "Configuração",
+       title = "MPKI conforme configuração",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
@@ -642,7 +650,8 @@ df2 %>%
   labs(x = "Aplicação",
        y = "Quantidade [x10^5]",
        fill = "Configuração utilizada",
-       title = "Utilidade dos prefetchs realizados na L1D") +
+       title = "Utilidade dos prefetchs realizados na L1D",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -683,7 +692,8 @@ df2 %>%
   labs(x = "Aplicação",
        y = "Quantidade [x10^5]",
        fill = "Configuração utilizada",
-       title = "Utilidade dos prefetchs realizados na L2C") +
+       title = "Utilidade dos prefetchs realizados na L2C",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -724,7 +734,8 @@ df2 %>%
   labs(x = "Aplicação",
        y = "Quantidade [x10^5]",
        fill = "Configuração utilizada",
-       title = "Utilidade dos prefetchs realizados na LLC") +
+       title = "Utilidade dos prefetchs realizados na LLC",
+       subtitle = "para o primeiro experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -1451,8 +1462,8 @@ Cores: 1
 
 Again, a script...
 
-#+begin_src bash :exports both :results output :dir ../results_inst8/
-OUT_FILE=inst8_results.csv
+#+begin_src bash :exports both :results output :dir ../results_stream_l1d/
+OUT_FILE=true_stream_results.csv
 
 echo "application,size,branch,l1i_pref,l1d_pref,l2c_pref,llc_pref,llc_rep,inst,cycles,ipc"\
      "l1i_tot_hit,l1i_tot_miss,l1i_pref_issued,l1i_pref_useful,l1i_pref_useless,l1i_lat"\
@@ -1603,7 +1614,7 @@ suppressMessages(library(tidyverse))
 options(crayon.enabled = FALSE)
 
 df_b <- read_csv("../results_base/base_results.csv")
-df_t <- read_csv("../results_inst8/inst8_results.csv") %>%
+df_t <- read_csv("../results_stream_l1d/true_stream_results.csv") %>%
   mutate(config = "Própria")
 
 basic <- df_b %>%
@@ -1657,7 +1668,7 @@ See spec(...) for full column specifications.
 
 And now let's take the already done EXP03 graphs.
 
-#+begin_src R :session :results output graphics :file images/inst8/ipc.png :exports both :width 800 :height 700
+#+begin_src R :session :results output graphics :file images/true_stream/ipc.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
 df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
@@ -1680,18 +1691,18 @@ df %>%
 #+end_src
 
 #+RESULTS:
-[[file:images/inst8/ipc.png]]
+[[file:images/true_stream/ipc.png]]
 
-Now, let's do MPKI by hand (for L1I):
+Now, let's do MPKI by hand (for L1D):
 
-#+begin_src R :session :results output graphics :file images/inst8/mpki_hand.png :exports both :width 800 :height 700
+#+begin_src R :session :results output graphics :file images/true_stream/mpki_hand.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
 df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
 
 df %>%
-  select(application, config, l1i_tot_miss, inst) %>%
-  mutate(mpki = l1i_tot_miss / (inst / 1000)) %>%
+  select(application, config, l1d_tot_miss, inst) %>%
+  mutate(mpki = l1d_tot_miss / (inst / 1000)) %>%
   ggplot(aes(fill = as.factor(config), y = mpki, x = as.factor(application))) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
   scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
@@ -1701,29 +1712,29 @@ df %>%
        y = "MPKI",
        fill = "Configuração",
        title = "MPKI conforme configuração",
-       subtitle = "na L1I para o quarto experimento") +
+       subtitle = "na L1D para o quarto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
 #+end_src
 
 #+RESULTS:
-[[file:images/inst8/mpki_hand.png]]
+[[file:images/true_stream/mpki_hand.png]]
 
 Now some hit and misses metrics for L1I:
 
-#+begin_src R :session :results output graphics :file images/inst8/hitmiss_l1i.png :exports both :width 1000 :height 900
+#+begin_src R :session :results output graphics :file images/true_stream/hitmiss_l1d.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
 
 df %>%
-  select(application, config, l1i_tot_hit) %>%
-  mutate(stat = "Hit", l1i_tot_hit = l1i_tot_hit / 1000000) %>%
-  rename(value = l1i_tot_hit) -> dfh
+  select(application, config, l1d_tot_hit) %>%
+  mutate(stat = "Hit", l1d_tot_hit = l1d_tot_hit / 1000000) %>%
+  rename(value = l1d_tot_hit) -> dfh
 
 df %>%
-  select(application, config, l1i_tot_miss) %>%
-  mutate(stat = "Miss", l1i_tot_miss = l1i_tot_miss / 1000000) %>%
-  rename(value = l1i_tot_miss) -> dfm
+  select(application, config, l1d_tot_miss) %>%
+  mutate(stat = "Miss", l1d_tot_miss = l1d_tot_miss / 1000000) %>%
+  rename(value = l1d_tot_miss) -> dfm
 
 df2 <- bind_rows(dfh, dfm)
 
@@ -1739,7 +1750,7 @@ df2 %>%
   labs(x = "Aplicação",
        y = "Quantidade [x10^6]",
        fill = "Configuração",
-       title = "Acessos à cache nível 1 de instruções",
+       title = "Acessos à cache nível 1 de dados",
        subtitle = "conforme hit ou miss para o quarto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
@@ -1748,16 +1759,16 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:images/inst8/hitmiss_l1i.png]]
+[[file:images/true_stream/hitmiss_l1d.png]]
 
 And relative misses...
 
-#+begin_src R :session :results output graphics :file images/inst8/relmiss_l1i.png :exports both :width 900 :height 600
+#+begin_src R :session :results output graphics :file images/true_stream/relmiss_l1d.png :exports both :width 900 :height 600
 suppressMessages(library(wesanderson))
 
 df %>%
-  select(application, config, l1i_tot_hit, l1i_tot_miss) %>%
-  mutate(stat = "L1I", value = l1i_tot_miss / l1i_tot_hit) %>%
+  select(application, config, l1d_tot_hit, l1d_tot_miss) %>%
+  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
   select(application, config, stat, value) -> df2
 
 df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
@@ -1771,7 +1782,7 @@ df2 %>%
   labs(x = "Aplicação",
        y = "Misses / Hits",
        fill = "Configuração",
-       title = "Misses relativos na L1I",
+       title = "Misses relativos na L1D",
        subtitle = "para o quarto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
@@ -1780,4 +1791,4 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:images/inst8/relmiss_l1i.png]]
+[[file:images/true_stream/relmiss_l1d.png]]
