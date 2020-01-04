@@ -37,6 +37,9 @@ implement.
   - [[#4---greedier-instruction-prefetcher][4 - Greedier Instruction Prefetcher]]
     - [[#preprocessing-3][Preprocessing]]
     - [[#analysis-3][Analysis]]
+  - [[#5---64-lines-l1d-prefetcher][5 - 64 lines L1D Prefetcher]]
+    - [[#preprocessing-4][Preprocessing]]
+    - [[#analysis-4][Analysis]]
 
 * Journal
 
@@ -1792,3 +1795,367 @@ df2 %>%
 
 #+RESULTS:
 [[file:images/true_stream/relmiss_l1d.png]]
+
+** 5 - 64 lines L1D Prefetcher
+
+*** Preprocessing
+
+First we gotta get that into a friendlier CSV format...
+
+#+begin_src bash :exports both :results output :dir ../results_stream_l1d_64/
+OUT_FILE=stream64_results.csv
+
+echo "application,size,branch,l1i_pref,l1d_pref,l2c_pref,llc_pref,llc_rep,inst,cycles,ipc"\
+     "l1i_tot_hit,l1i_tot_miss,l1i_pref_issued,l1i_pref_useful,l1i_pref_useless,l1i_lat"\
+     "l1d_tot_hit,l1d_tot_miss,l1d_pref_issued,l1d_pref_useful,l1d_pref_useless,l1d_lat"\
+     "l2c_tot_hit,l2c_tot_miss,l2c_pref_issued,l2c_pref_useful,l2c_pref_useless,l2c_lat"\
+     "llc_tot_hit,llc_tot_miss,llc_pref_issued,llc_pref_useful,llc_pref_useless,llc_lat"\
+     "branch_acc,mpki"\
+     "branch_direct,branch_indirect,branch_cond,branch_dir_call,branch_ind_call,branch_ret" | tr ' ' ',' > $OUT_FILE
+
+for file in [0-9]*; do
+    # INFO ABOUT CONFIG
+
+    buffer=$(tr '-' ' ' <<<$file)
+
+    app=$(awk '{print $1}' <<<$buffer)
+    size=$(awk '{print $2}' <<<$buffer)
+    branch=$(awk '{print $3}' <<<$buffer)
+    l1i_p=$(awk '{print $4}' <<<$buffer)
+    l1d_p=$(awk '{print $5}' <<<$buffer)
+    l2_p=$(awk '{print $6}' <<<$buffer)
+    llc_p=$(awk '{print $7}' <<<$buffer)
+    llc_repl=$(awk '{print $8}' <<<$buffer)
+
+    line=${app##*.},${size%%.*},${branch},${l1i_p},${l1d_p},${l2_p},${llc_p},${llc_repl},
+
+    # GENERAL INFO
+
+    buffer=$(grep "CPU 0 cumulative" $file)
+    insts=$(awk '{print $7}' <<<$buffer)
+    cycles=$(awk '{print $9}' <<<$buffer)
+    ipc=$(awk '{print $5}' <<<$buffer)
+
+    line+=${insts},${cycles},${ipc},
+
+    # LEVEL 1 INST
+
+    buffer=$(grep "L1I TOTAL" $file)
+    l1i_hit=$(awk '{print $6}' <<<$buffer)
+    l1i_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1i_hit},${l1i_miss},
+
+    buffer=$(grep "L1I PREFETCH  REQUESTED:" $file)
+    l1i_iss=$(awk '{print $6}' <<<$buffer)
+    l1i_usef=$(awk '{print $8}' <<<$buffer)
+    l1i_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1i_iss},${l1i_usef},${l1i_less},
+
+    buffer=$(grep "L1I AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    # LEVEL 1 DATA
+
+    buffer=$(grep "L1D TOTAL" $file)
+    l1d_hit=$(awk '{print $6}' <<<$buffer)
+    l1d_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1d_hit},${l1d_miss},
+
+    buffer=$(grep "L1D PREFETCH  REQUESTED:" $file)
+    l1d_iss=$(awk '{print $6}' <<<$buffer)
+    l1d_usef=$(awk '{print $8}' <<<$buffer)
+    l1d_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1d_iss},${l1d_usef},${l1d_less},
+
+    buffer=$(grep "L1D AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    # LEVEL 2 CACHE
+
+    buffer=$(grep "L2C TOTAL" $file)
+    l1d_hit=$(awk '{print $6}' <<<$buffer)
+    l1d_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1d_hit},${l1d_miss},
+
+    buffer=$(grep "L2C PREFETCH  REQUESTED:" $file)
+    l1d_iss=$(awk '{print $6}' <<<$buffer)
+    l1d_usef=$(awk '{print $8}' <<<$buffer)
+    l1d_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1d_iss},${l1d_usef},${l1d_less},
+
+    buffer=$(grep "L2C AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    # LAST LEVEL CACHE
+
+    buffer=$(grep "LLC TOTAL" $file)
+    l1d_hit=$(awk '{print $6}' <<<$buffer)
+    l1d_miss=$(awk '{print $8}' <<<$buffer)
+
+    line+=${l1d_hit},${l1d_miss},
+
+    buffer=$(grep "LLC PREFETCH  REQUESTED:" $file)
+    l1d_iss=$(awk '{print $6}' <<<$buffer)
+    l1d_usef=$(awk '{print $8}' <<<$buffer)
+    l1d_less=$(awk '{print $10}' <<<$buffer)
+
+    line+=${l1d_iss},${l1d_usef},${l1d_less},
+
+    buffer=$(grep "LLC AVERAGE MISS" $file | tr -d '-')
+
+    line+=$(awk '{print $5}' <<<$buffer),
+
+    # BRANCH PREDICTION
+
+    buffer=$(grep "CPU 0 Branch Prediction" $file)
+
+    branch_acc=$(awk '{print $6}' <<<$buffer | tr -d '%')
+    mpki=$(awk '{print $8}' <<<$buffer)
+
+    line+=${branch_acc},${mpki},
+
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_DIRECT_JUMP:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_INDIRECT:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_CONDITIONAL:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_DIRECT_CALL:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_INDIRECT_CALL:" $file) | tr -d '%'),
+    line+=$(awk '{print $3}' <<<$(grep "BRANCH_RETURN:" $file) | tr -d '%')
+
+    echo $line >> $OUT_FILE
+    echo "finished this line, yay!"
+done
+
+echo "i'm done!"
+#+end_src
+
+#+RESULTS:
+#+begin_example
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+i'm done!
+#+end_example
+
+*** Analysis
+
+In order to compare both base and these results, we gotta join them...
+
+#+begin_src R :session :results output :exports both
+suppressMessages(library(tidyverse))
+options(crayon.enabled = FALSE)
+
+df_b <- read_csv("../results_base/base_results.csv")
+df_s <- read_csv("../results_stream_l1d_64/stream64_results.csv")
+
+basic <- df_b %>%
+  filter(l2c_pref == "no") %>%
+  mutate(config = "Simples")
+
+medium <- df_b %>%
+  filter(l2c_pref == "ip_stride") %>%
+  mutate(config = "Mediana")
+
+adv <- df_b %>%
+  filter(l2c_pref == "kpcp") %>%
+  mutate(config = "Avançada")
+
+basic_m <- df_s %>%
+  filter(l2c_pref == "no") %>%
+  mutate(config = "Simples - mod")
+
+medium_m <- df_s %>%
+  filter(l2c_pref == "ip_stride") %>%
+  mutate(config = "Mediana - mod")
+
+adv_m <- df_s %>%
+  filter(l2c_pref == "kpcp") %>%
+  mutate(config = "Avançada - mod")
+
+df_b <- bind_rows(basic, medium, adv)
+df_s <- bind_rows(basic_m, medium_m, adv_m)
+
+df <- bind_rows(df_b, df_s)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+
+Parsed with column specification:
+cols(
+  .default = col_double(),
+  application = col_character(),
+  size = col_character(),
+  branch = col_character(),
+  l1i_pref = col_character(),
+  l1d_pref = col_character(),
+  l2c_pref = col_character(),
+  llc_pref = col_character(),
+  llc_rep = col_character()
+)
+See spec(...) for full column specifications.
+
+Parsed with column specification:
+cols(
+  .default = col_double(),
+  application = col_character(),
+  size = col_character(),
+  branch = col_character(),
+  l1i_pref = col_character(),
+  l1d_pref = col_character(),
+  l2c_pref = col_character(),
+  llc_pref = col_character(),
+  llc_rep = col_character()
+)
+See spec(...) for full column specifications.
+#+end_example
+
+Starting with IPC
+
+#+begin_src R :session :results output graphics :file images/stream64/ipc.png :exports both :width 850 :height 700
+suppressMessages(library(wesanderson))
+
+df$config <- factor(df$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
+
+df %>%
+  select(application, config, ipc) %>%
+  ggplot(aes(fill = as.factor(config), y = ipc, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.05)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "Instruções Por Ciclo",
+       fill = "Configuração",
+       title = "IPC conforme configuração",
+       subtitle = "para o terceiro experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream64/ipc.png]]
+
+and by hand MPKI
+
+#+RESULTS:
+[[file:images/stream/mpki.png]]
+
+#+begin_src R :session :results output graphics :file images/stream64/mpki_hand.png :exports both :width 850 :height 700
+suppressMessages(library(wesanderson))
+
+df$config <- factor(df$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
+
+df %>%
+  select(application, config, l1d_tot_miss, inst) %>%
+  mutate(mpki = l1d_tot_miss / (inst / 1000)) %>%
+  ggplot(aes(fill = as.factor(config), y = mpki, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.05)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "MPKI",
+       fill = "Configuração",
+       title = "MPKI conforme configuração",
+       subtitle = "na L1D para o terceiro experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream64/mpki_hand.png]]
+
+Now some hit and misses metrics for L1D:
+
+#+begin_src R :session :results output graphics :file images/stream64/hitmiss_l1d.png :exports both :width 1000 :height 900
+suppressMessages(library(wesanderson))
+
+df %>%
+  select(application, config, l1d_tot_hit) %>%
+  mutate(stat = "Hit", l1d_tot_hit = l1d_tot_hit / 1000000) %>%
+  rename(value = l1d_tot_hit) -> dfh
+
+df %>%
+  select(application, config, l1d_tot_miss) %>%
+  mutate(stat = "Miss", l1d_tot_miss = l1d_tot_miss / 1000000) %>%
+  rename(value = l1d_tot_miss) -> dfm
+
+df2 <- bind_rows(dfh, dfm)
+
+df2$config <- factor(df2$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
+
+df2 %>%
+  ggplot(aes(fill = as.factor(config), y = value, x = as.factor(application))) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  facet_grid(stat ~ .) +
+  labs(x = "Aplicação",
+       y = "Quantidade [x10^6]",
+       fill = "Configuração",
+       title = "Acessos à cache nível 1 de dados",
+       subtitle = "conforme hit ou miss para o terceiro experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream64/hitmiss_l1d.png]]
+
+And relative misses...
+
+#+begin_src R :session :results output graphics :file images/stream64/relmiss_l1d.png :exports both :width 900 :height 600
+suppressMessages(library(wesanderson))
+
+df %>%
+  select(application, config, l1d_tot_hit, l1d_tot_miss) %>%
+  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
+  select(application, config, stat, value) -> df2
+
+df2$config <- factor(df2$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
+
+df2 %>%
+  ggplot(aes(fill = config, y = value, x = application)) +
+  geom_col(position = "dodge2", width = 0.6, color = "black") +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
+  scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
+                     breaks = scales::pretty_breaks(n = 8)) +
+  labs(x = "Aplicação",
+       y = "Misses / Hits",
+       fill = "Configuração",
+       title = "Misses relativos na L1D",
+       subtitle = "para o terceiro experimento") +
+  theme_bw() +
+  theme(text = element_text(family = "Palatino", size = 28),
+        panel.spacing = unit(2, "lines"),
+        legend.position = "top")
+#+end_src
+
+#+RESULTS:
+[[file:images/stream64/relmiss_l1d.png]]
