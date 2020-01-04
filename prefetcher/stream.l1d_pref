@@ -1,33 +1,31 @@
 #include "cache.h"
 
-void CACHE::l1d_prefetcher_initialize() 
+void CACHE::l1d_prefetcher_initialize()
 {
-    cout << "CPU " << cpu << " L1D next line prefetcher" << endl;
+    cout << "CPU " << cpu << " L1D stream prefetcher" << endl;
 }
 
-// ip stands for instruction pointer, and I don't see how the ip could be useful in the next line pref. Answer: in a simple next line prefetcher, the IP is indeed not important. But when considering an IP based prefetch policy, the IP will be an extra information used to correctly prefetch data based on the pattern observed for the given instruction. More can be found in ../labbook.txt.
-// for the type, not really important but is about read or write
-// in the case of the l1D, the addr comes diretly from the load queue
+
+// an explanation about the weird address manipulation they're doing:
+// a cache access is composed by TAG + INDEX + OFFSET
+// the byte accessed (via offset) in the given line is not important in determining
+// the next address to be prefetched, because it will be the beginning of the next cache line
+// Therefore, we ignore the 6 LSB (>> LOG2_BLOCK_SIZE) and add 1 so we're
+// accessing curr_addrs+64, the next cache line address.
+// To implement a stream prefetcher we have only to perform the same manipulation
+// inside a for loop how many times needed
 void CACHE::l1d_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type)
 {
-    // why do the >> and the +1 are necessary?
-    uint64_t pf_addr = ((addr>>LOG2_BLOCK_SIZE)+1) << LOG2_BLOCK_SIZE;
+    uint64_t pf_addr = addr;
 
     DP ( if (warmup_complete[cpu]) {
     cout << "[" << NAME << "] " << __func__ << hex << " base_cl: " << (addr>>LOG2_BLOCK_SIZE);
     cout << " pf_cl: " << (pf_addr>>LOG2_BLOCK_SIZE) << " ip: " << ip << " cache_hit: " << +cache_hit << " type: " << +type << endl; });
 
-    prefetch_line(ip, addr, pf_addr, FILL_L1, 0);
-
-    pf_addr += ((pf_addr>>LOG2_BLOCK_SIZE)+1) << LOG2_BLOCK_SIZE;
-    prefetch_line(ip, addr, pf_addr, FILL_L1, 0);
-
-    pf_addr += ((pf_addr>>LOG2_BLOCK_SIZE)+1) << LOG2_BLOCK_SIZE;
-    prefetch_line(ip, addr, pf_addr, FILL_L1, 0);
-
-    pf_addr += ((pf_addr>>LOG2_BLOCK_SIZE)+1) << LOG2_BLOCK_SIZE;
-    prefetch_line(ip, addr, pf_addr, FILL_L1, 0);
-
+    for (int i = 0; i < 64; i++) {
+      pf_addr = ((pf_addr>>LOG2_BLOCK_SIZE)+1) << LOG2_BLOCK_SIZE;
+      prefetch_line(ip, addr, pf_addr, FILL_L1, 0);
+    }
 }
 
 void CACHE::l1d_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t way, uint8_t prefetch, uint64_t evicted_addr, uint32_t metadata_in)
@@ -37,5 +35,5 @@ void CACHE::l1d_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t way,
 
 void CACHE::l1d_prefetcher_final_stats()
 {
-    cout << "CPU " << cpu << " L1D next line prefetcher final stats" << endl;
+    cout << "CPU " << cpu << " L1D stream prefetcher final stats" << endl;
 }
