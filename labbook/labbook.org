@@ -34,7 +34,7 @@ implement.
   - [[#3---data-prefetcher][3 - Data Prefetcher]]
     - [[#preprocessing-2][Preprocessing]]
     - [[#analysis-2][Analysis]]
-  - [[#4---greedier-instruction-prefetcher][4 - Greedier Instruction Prefetcher]]
+  - [[#4---greedier-data-prefetcher][4 - Greedier Data Prefetcher]]
     - [[#preprocessing-3][Preprocessing]]
     - [[#analysis-3][Analysis]]
   - [[#5---64-lines-l1d-prefetcher][5 - 64 lines L1D Prefetcher]]
@@ -1349,9 +1349,6 @@ df %>%
 
 and by hand MPKI
 
-#+RESULTS:
-[[file:images/stream/mpki.png]]
-
 #+begin_src R :session :results output graphics :file images/stream/mpki_hand.png :exports both :width 800 :height 700
 suppressMessages(library(wesanderson))
 
@@ -1450,19 +1447,9 @@ df2 %>%
 #+RESULTS:
 [[file:images/stream/relmiss_l1d.png]]
 
-** 4 - Greedier Instruction Prefetcher
+** 4 - Greedier Data Prefetcher
 
-Even more instruction when fetching.
-
-#+begin_example
-Branch Predictor: bimodal
-L1D Prefetcher: next_line
-L1I Prefetcher: next_line
-L2C Prefetcher: no
-LLC Prefetcher: no
-LLC Replacement: lru
-Cores: 1
-#+end_example
+Even more data when fetching.
 
 *** Preprocessing
 
@@ -1727,7 +1714,7 @@ df %>%
 #+RESULTS:
 [[file:images/true_stream/mpki_hand.png]]
 
-Now some hit and misses metrics for L1I:
+Now some hit and misses metrics for L1D:
 
 #+begin_src R :session :results output graphics :file images/true_stream/hitmiss_l1d.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
@@ -2051,7 +2038,7 @@ df %>%
        y = "Instruções Por Ciclo",
        fill = "Configuração",
        title = "IPC conforme configuração",
-       subtitle = "para o terceiro experimento") +
+       subtitle = "para o quinto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
@@ -2061,9 +2048,6 @@ df %>%
 [[file:images/stream64/ipc.png]]
 
 and by hand MPKI
-
-#+RESULTS:
-[[file:images/stream/mpki.png]]
 
 #+begin_src R :session :results output graphics :file images/stream64/mpki_hand.png :exports both :width 850 :height 700
 suppressMessages(library(wesanderson))
@@ -2082,7 +2066,7 @@ df %>%
        y = "MPKI",
        fill = "Configuração",
        title = "MPKI conforme configuração",
-       subtitle = "na L1D para o terceiro experimento") +
+       subtitle = "na L1D para o quinto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
@@ -2121,7 +2105,7 @@ df2 %>%
        y = "Quantidade [x10^6]",
        fill = "Configuração",
        title = "Acessos à cache nível 1 de dados",
-       subtitle = "conforme hit ou miss para o terceiro experimento") +
+       subtitle = "conforme hit ou miss para o quinto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -2153,7 +2137,7 @@ df2 %>%
        y = "Misses / Hits",
        fill = "Configuração",
        title = "Misses relativos na L1D",
-       subtitle = "para o terceiro experimento") +
+       subtitle = "para o quinto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -2305,12 +2289,24 @@ echo "i'm done!"
 #+end_src
 
 #+RESULTS:
-: finished this line, yay!
-: finished this line, yay!
-: finished this line, yay!
-: finished this line, yay!
-: finished this line, yay!
-: i'm done!
+#+begin_example
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+finished this line, yay!
+i'm done!
+#+end_example
 
 *** Analysis
 
@@ -2321,8 +2317,7 @@ suppressMessages(library(tidyverse))
 options(crayon.enabled = FALSE)
 
 df_b <- read_csv("../results_base/base_results.csv")
-df_t <- read_csv("../results_stream_l1d/true_stream_results.csv") %>%
-  mutate(config = "Própria")
+df_s <- read_csv("../results_stream_l1i/stream_inst_results.csv")
 
 basic <- df_b %>%
   filter(l2c_pref == "no") %>%
@@ -2336,9 +2331,22 @@ adv <- df_b %>%
   filter(l2c_pref == "kpcp") %>%
   mutate(config = "Avançada")
 
-df_b <- bind_rows(basic, medium, adv)
+basic_m <- df_s %>%
+  filter(l2c_pref == "no") %>%
+  mutate(config = "Simples - mod")
 
-df <- bind_rows(df_b, df_t)
+medium_m <- df_s %>%
+  filter(l2c_pref == "ip_stride") %>%
+  mutate(config = "Mediana - mod")
+
+adv_m <- df_s %>%
+  filter(l2c_pref == "kpcp") %>%
+  mutate(config = "Avançada - mod")
+
+df_b <- bind_rows(basic, medium, adv)
+df_s <- bind_rows(basic_m, medium_m, adv_m)
+
+df <- bind_rows(df_b, df_s)
 #+end_src
 
 #+RESULTS:
@@ -2375,90 +2383,90 @@ See spec(...) for full column specifications.
 
 And now let's take the already done EXP03 graphs.
 
-#+begin_src R :session :results output graphics :file images/true_stream/ipc.png :exports both :width 800 :height 700
+#+begin_src R :session :results output graphics :file images/stream_l1i/ipc.png :exports both :width 850 :height 700
 suppressMessages(library(wesanderson))
 
-df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+df$config <- factor(df$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
 
 df %>%
   select(application, config, ipc) %>%
   ggplot(aes(fill = as.factor(config), y = ipc, x = as.factor(application))) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
-  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
   scale_y_continuous(expand = expand_scale(mult = c(0, 0.05)),
                      breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
        y = "Instruções Por Ciclo",
        fill = "Configuração",
        title = "IPC conforme configuração",
-       subtitle = "para o quarto experimento") +
+       subtitle = "para o sexto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
 #+end_src
 
 #+RESULTS:
-[[file:images/true_stream/ipc.png]]
+[[file:images/stream_l1i/ipc.png]]
 
-Now, let's do MPKI by hand (for L1D):
+Now, let's do MPKI by hand (for L1I):
 
-#+begin_src R :session :results output graphics :file images/true_stream/mpki_hand.png :exports both :width 800 :height 700
+#+begin_src R :session :results output graphics :file images/stream_l1i/mpki_hand.png :exports both :width 850 :height 700
 suppressMessages(library(wesanderson))
 
-df$config <- factor(df$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+df$config <- factor(df$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
 
 df %>%
-  select(application, config, l1d_tot_miss, inst) %>%
-  mutate(mpki = l1d_tot_miss / (inst / 1000)) %>%
+  select(application, config, l1i_tot_miss, inst) %>%
+  mutate(mpki = l1i_tot_miss / (inst / 1000)) %>%
   ggplot(aes(fill = as.factor(config), y = mpki, x = as.factor(application))) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
-  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
   scale_y_continuous(expand = expand_scale(mult = c(0, 0.05)),
                      breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
        y = "MPKI",
        fill = "Configuração",
        title = "MPKI conforme configuração",
-       subtitle = "na L1D para o quarto experimento") +
+       subtitle = "na L1I para o sexto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         legend.position = "top")
 #+end_src
 
 #+RESULTS:
-[[file:images/true_stream/mpki_hand.png]]
+[[file:images/stream_l1i/mpki_hand.png]]
 
 Now some hit and misses metrics for L1I:
 
-#+begin_src R :session :results output graphics :file images/true_stream/hitmiss_l1d.png :exports both :width 1000 :height 900
+#+begin_src R :session :results output graphics :file images/stream_l1i/hitmiss_l1i.png :exports both :width 1000 :height 900
 suppressMessages(library(wesanderson))
 
 df %>%
-  select(application, config, l1d_tot_hit) %>%
-  mutate(stat = "Hit", l1d_tot_hit = l1d_tot_hit / 1000000) %>%
-  rename(value = l1d_tot_hit) -> dfh
+  select(application, config, l1i_tot_hit) %>%
+  mutate(stat = "Hit", l1i_tot_hit = l1i_tot_hit / 1000000) %>%
+  rename(value = l1i_tot_hit) -> dfh
 
 df %>%
-  select(application, config, l1d_tot_miss) %>%
-  mutate(stat = "Miss", l1d_tot_miss = l1d_tot_miss / 1000000) %>%
-  rename(value = l1d_tot_miss) -> dfm
+  select(application, config, l1i_tot_miss) %>%
+  mutate(stat = "Miss", l1i_tot_miss = l1i_tot_miss / 1000000) %>%
+  rename(value = l1i_tot_miss) -> dfm
 
 df2 <- bind_rows(dfh, dfm)
 
-df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+df2$config <- factor(df2$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
 
 df2 %>%
   ggplot(aes(fill = as.factor(config), y = value, x = as.factor(application))) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
-  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
   scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
                      breaks = scales::pretty_breaks(n = 8)) +
   facet_grid(stat ~ .) +
   labs(x = "Aplicação",
        y = "Quantidade [x10^6]",
        fill = "Configuração",
-       title = "Acessos à cache nível 1 de dados",
-       subtitle = "conforme hit ou miss para o quarto experimento") +
+       title = "Acessos à cache nível 1 de instruções",
+       subtitle = "conforme hit ou miss para o sexto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -2466,31 +2474,31 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:images/true_stream/hitmiss_l1d.png]]
+[[file:images/stream_l1i/hitmiss_l1i.png]]
 
 And relative misses...
 
-#+begin_src R :session :results output graphics :file images/true_stream/relmiss_l1d.png :exports both :width 900 :height 600
+#+begin_src R :session :results output graphics :file images/stream_l1i/relmiss_l1i.png :exports both :width 900 :height 600
 suppressMessages(library(wesanderson))
 
 df %>%
-  select(application, config, l1d_tot_hit, l1d_tot_miss) %>%
-  mutate(stat = "L1D", value = l1d_tot_miss / l1d_tot_hit) %>%
+  select(application, config, l1i_tot_hit, l1i_tot_miss) %>%
+  mutate(stat = "L1I", value = l1i_tot_miss / l1i_tot_hit) %>%
   select(application, config, stat, value) -> df2
 
-df2$config <- factor(df2$config, levels = c("Simples", "Mediana", "Avançada", "Própria"))
+df2$config <- factor(df2$config, levels = c("Simples", "Simples - mod", "Mediana", "Mediana - mod", "Avançada", "Avançada - mod"))
 
 df2 %>%
   ggplot(aes(fill = config, y = value, x = application)) +
   geom_col(position = "dodge2", width = 0.6, color = "black") +
-  scale_fill_manual(values = wes_palette(n = 4, name = "GrandBudapest1")) +
+  scale_fill_manual(values = wes_palette(n = 6, name = "IsleofDogs1")) +
   scale_y_continuous(expand = expand_scale(mult = c(0, 0.03)),
                      breaks = scales::pretty_breaks(n = 8)) +
   labs(x = "Aplicação",
        y = "Misses / Hits",
        fill = "Configuração",
-       title = "Misses relativos na L1D",
-       subtitle = "para o quarto experimento") +
+       title = "Misses relativos na L1I",
+       subtitle = "para o sexto experimento") +
   theme_bw() +
   theme(text = element_text(family = "Palatino", size = 28),
         panel.spacing = unit(2, "lines"),
@@ -2498,4 +2506,4 @@ df2 %>%
 #+end_src
 
 #+RESULTS:
-[[file:images/true_stream/relmiss_l1d.png]]
+[[file:images/stream_l1i/relmiss_l1i.png]]
